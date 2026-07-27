@@ -34,10 +34,15 @@ export const loginUserService = async (userData) => {
     throw new ApiError(401, "Invalid email or password");
   }
 
-  const accessToken = user.generateAccessToken();
-  const refreshToken = user.generateRefreshToken();
+  const accessToken =await user.generateAccessToken();
+  const refreshToken = await user.generateRefreshToken();
 
   user.refreshToken = refreshToken;
+
+  // console.log(accessToken)
+  // console.log(typeof accessToken)
+  // console.log(refreshToken)
+  // console.log(typeof refreshToken)
 
   await user.save({ validateBeforeSave: false });
 
@@ -45,7 +50,7 @@ export const loginUserService = async (userData) => {
     .select("-password -refreshToken");
 
   return {
-    user: loggedInUser,
+    user:loggedInUser,
     accessToken,
     refreshToken,
   };

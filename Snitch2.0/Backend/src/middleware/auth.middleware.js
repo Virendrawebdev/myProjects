@@ -1,14 +1,18 @@
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
-import userModel from "../models/user.model.js";
+import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 
 
-export const verifyJWT = async(res, req, next) =>{
+export const verifyJWT = async(req, res, next) =>{
     try{
-        const token= req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer", "")
+        const token= req.cookies?.accessToken || req.get("Authorization")?.replace("Bearer ", "");
+        // console.log(req.cookies)
+        // console.log("typeof", typeof req.cookies)
+        // console.log(token)
+        // console.log("typeof", typeof token)
         if(!token){
-            throw new ApiError(401, "Unathorized request");
+            throw new ApiError(401, "Unauthorized request");
         }
         const decodedToken = jwt.verify(token, config.ACCESS_TOKEN_SECRET);
 
