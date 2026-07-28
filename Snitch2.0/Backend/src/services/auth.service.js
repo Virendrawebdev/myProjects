@@ -1,5 +1,7 @@
 import User from "../models/user.model.js"
 import ApiError from "../utils/ApiError.js";
+import { config } from "../config/config.js";
+import jwt from 'jsonwebtoken'
 
 
 export const registerUserService =async (userData)=>{
@@ -55,3 +57,44 @@ export const loginUserService = async (userData) => {
     refreshToken,
   };
 };
+
+export const logoutUserService = async(userId) =>{
+  await User.findByIdAndUpdate(userId, {
+    $set:{
+      refreshToken:null,
+    }
+  })
+}
+
+export const refreshAccessTokenService = async (incomingRefreshToken) => {
+  if (!incomingRefreshToken) {
+    throw new ApiError(401, "refresh token is required");
+  }
+
+  let decodedToken;
+  try {
+    decodedToken = jwt.verify(incomingRefreshToken, config.REFRESH_TOKEN_SECRET);
+  } catch (err) {
+    throw new ApiError(401, "Invalid refresh token");
+  }
+
+  const user = await User.findById(decodedToken._id).select("+refreshToken");
+
+  if (!user || user.refreshToken !== incomingRefreshToken) {
+    throw new ApiError(401, "Refresh token expired or invalid");
+  }
+
+  const accessToken = await user.generateAccessToken();
+  const refreshToken = await user.generateRefreshToken();
+
+  user.refreshToken = refreshToken;
+
+  await user.save({
+    validateBeforeSave: false,
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+} 
