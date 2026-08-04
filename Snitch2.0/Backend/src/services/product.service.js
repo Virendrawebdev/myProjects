@@ -72,7 +72,7 @@ export const deleteProductService = async (productId, userId) => {
 }
 
 //search product service
-export const searchProductService = async (search, category, minPrice, maxPrice) => {
+export const searchProductService = async (search, category, minPrice, maxPrice, sort, page, limit) => {
  const query = {};
   if (search) {
     query.productName = { $regex: search, $options: "i" };
@@ -90,7 +90,10 @@ export const searchProductService = async (search, category, minPrice, maxPrice)
         query.price.$lte = Number(maxPrice);
     }
   }
+  page = Number(page) || 1;
+  limit = Number(limit) || 10;
+  const skip = (page - 1) * limit;
 //   console.log(query);
-  const products = await Product.find(query);
+  const products = await Product.find(query).sort(sort || "-createdAt").skip(skip).limit(limit);
   return products;
 };

@@ -1,58 +1,58 @@
-import { createProductService, getMyProductsService, getAllProductsService, getSingleProductService, updateProductService, deleteProductService, searchProductService} from "../services/product.service.js";
+import { createProductService, getMyProductsService, getAllProductsService, getSingleProductService, updateProductService, deleteProductService, searchProductService } from "../services/product.service.js";
 //create product controller
-export const createProduct = async (req, res, next)=>{
-    try{
+export const createProduct = async (req, res, next) => {
+    try {
         const product = await createProductService(req.body, req.user._id);
         return res.status(201).json({
-            success:true,
-            message:"Product created successfully",
-            data:product,
+            success: true,
+            message: "Product created successfully",
+            data: product,
         })
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 }
 //get my products controller
-export const getMyProducts = async (req, res, next)=>{
-    try{
-      const products = await getMyProductsService(req.user._id);
-      return res.status(200).json({
-        success:true,
-        message:"Products Fetched successFully",
-        data:products,
-      })
-    }catch(error){
+export const getMyProducts = async (req, res, next) => {
+    try {
+        const products = await getMyProductsService(req.user._id);
+        return res.status(200).json({
+            success: true,
+            message: "Products Fetched successFully",
+            data: products,
+        })
+    } catch (error) {
         next(error);
     }
 }
 
 //get all products controller
-export const getAllProducts = async (req, res, next)=>{
-    try{
-      const products = await getAllProductsService();
-      return res.status(200).json({
-        success:true,
-        message:"Products Fetched successFully",
-        data:products,
-      })
-    }catch(error){
+export const getAllProducts = async (req, res, next) => {
+    try {
+        const products = await getAllProductsService();
+        return res.status(200).json({
+            success: true,
+            message: "Products Fetched successFully",
+            data: products,
+        })
+    } catch (error) {
         next(error);
     }
 }
 
 //get single product controller
-export const getSingleProduct = async (req, res, next)=>{
-  try{
-    const product = await getSingleProductService(req.params.id);
-    return res.status(200).json({
-      success:true,
-      message:"Product Fetched successFully",
-      data:product,
-    })
-  }catch(error){
-    next(error);
-  }
+export const getSingleProduct = async (req, res, next) => {
+    try {
+        const product = await getSingleProductService(req.params.id);
+        return res.status(200).json({
+            success: true,
+            message: "Product Fetched successFully",
+            data: product,
+        })
+    } catch (error) {
+        next(error);
+    }
 }
 
 //update product controller
@@ -86,7 +86,14 @@ export const deleteProduct = async (req, res, next) => {
 //search product controller
 export const searchProduct = async (req, res, next) => {
     try {
-        const products = await searchProductService(req.query.search, req.query.category, req.query.minPrice, req.query.maxPrice);
+        const products = await searchProductService(req.query.search,
+            req.query.category,
+            req.query.minPrice,
+            req.query.maxPrice,
+            req.query.sort,
+            req.query.page,
+            req.query.limit
+        );
         return res.status(200).json({
             success: true,
             count: products.length,
