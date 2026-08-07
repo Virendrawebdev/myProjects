@@ -7,6 +7,7 @@ import productRoutes from './routes/product.routes.js'
 import cartRoutes from './routes/cart.routes.js'
 import checkoutRoutes from './routes/checkout.routes.js'
 import orderRoutes from './routes/order.routes.js'
+import wishlistRoutes from './routes/wishlist.routes.js'
 
 
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/products", productRoutes)
 app.use("/api/cart", cartRoutes)
 app.use("/api/checkout", checkoutRoutes)
 app.use("/api/orders", orderRoutes)
+app.use("/api/wishlist", wishlistRoutes)
 app.use(errorHandler);
 
 export default app;
