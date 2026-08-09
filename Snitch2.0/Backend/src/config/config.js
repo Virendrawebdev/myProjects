@@ -13,5 +13,7 @@ export const config = {
     ACCESS_TOKEN_EXPIRY:process.env.ACCESS_TOKEN_EXPIRY,
     REFRESH_TOKEN_SECRET:process.env.REFRESH_TOKEN_SECRET,
     REFRESH_TOKEN_EXPIRY:process.env.REFRESH_TOKEN_EXPIRY,
-    NODE_ENV:process.env.NODE_ENV
+    NODE_ENV:process.env.NODE_ENV,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY
 }
+
