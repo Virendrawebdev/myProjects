@@ -1,12 +1,13 @@
 import Product from "../models/product.model.js";
 import Seller from "../models/seller.model.js";
+import ApiError from "../utils/ApiError.js"
 
 
 //create product service
 export const createProductService = async (productData, userId) => {
     const seller = await Seller.findOne({ user: userId });
     if (!seller) {
-        throw new Error("Seller not found");
+        throw new ApiError("Seller not found");
     }
     const product = await Product.create({ ...productData, seller: seller._id });
     return product;
@@ -17,7 +18,7 @@ export const getMyProductsService = async (userId)=>{
     const seller = await Seller.findOne({user:userId});
 
 if(!seller){
-    throw new Error("Seller not found");
+    throw new ApiError("Seller not found");
 }
 const products = await Product.find({ seller: seller._id });
 return products;
@@ -33,7 +34,7 @@ export const getAllProductsService = async()=>{
 export const getSingleProductService = async(productId)=>{
     const product = await Product.findById(productId);
     if (!product) {
-        throw new Error("Product not found");
+        throw new ApiError("Product not found");
     }
     return product;
 }
@@ -42,14 +43,14 @@ export const getSingleProductService = async(productId)=>{
 export const updateProductService = async (productId, productData, userId) => {
     const seller = await Seller.findOne({ user: userId });
     if (!seller) {
-        throw new Error("Seller not found");
+        throw new ApiError("Seller not found");
     }
     const product = await Product.findByIdAndUpdate(productId, productData, { new: true });
     if (!product) {
-        throw new Error("Product not found");
+        throw new ApiError("Product not found");
     }
     if (product.seller.toString() !== seller._id.toString()) {
-        throw new Error("You are not authorized to update this product");
+        throw new ApiError("You are not authorized to update this product");
     }
     return product;
 }
@@ -58,14 +59,14 @@ export const updateProductService = async (productId, productData, userId) => {
 export const deleteProductService = async (productId, userId) => {
     const seller = await Seller.findOne({ user: userId });
     if (!seller) {
-        throw new Error("Seller not found");
+        throw new ApiError("Seller not found");
     }
     const product = await Product.findById(productId);
     if (!product) {
-        throw new Error("Product not found");
+        throw new ApiError("Product not found");
     }
     if (product.seller.toString() !== seller._id.toString()) {
-        throw new Error("You are not authorized to delete this product");
+        throw new ApiError("You are not authorized to delete this product");
     }
     await Product.findByIdAndDelete(productId);
 

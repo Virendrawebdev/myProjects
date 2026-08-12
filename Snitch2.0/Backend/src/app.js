@@ -10,6 +10,7 @@ import orderRoutes from './routes/order.routes.js'
 import wishlistRoutes from './routes/wishlist.routes.js'
 import aiRoutes from './routes/ai.routes.js'
 import reviewRoutes from "./routes/review.routes.js"
+import paymentsRoutes from "./routes/payment.routes.js"
 
 
 const app = express();
@@ -35,6 +36,7 @@ app.use("/api/orders", orderRoutes)
 app.use("/api/wishlist", wishlistRoutes)
 app.use("/api/ai", aiRoutes)
 app.use("/api/review", reviewRoutes)
+app.use("/api/payments", paymentsRoutes)
 app.use(errorHandler);
 
 export default app;
