@@ -12,6 +12,9 @@ export const placeOrderService = async(userId, shippingAddress, paymentMethod) =
    }
    let totalAmount = 0;
    cart.products.forEach((item) => {
+    if(item.product.stock <item.quantity){
+      throw new ApiError(400, `Insufficient stock for ${item.product.productName}`)
+    }
     const price= item.product.discountPrice ? item.product.discountPrice : item.product.price;
     totalAmount += price * item.quantity;
    });
