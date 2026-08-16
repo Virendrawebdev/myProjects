@@ -1,4 +1,4 @@
-import {placeOrderService, getOrdersService, getSellerOrdersService, updateOrderStatusService} from "../services/order.service.js";
+import {placeOrderService, getOrdersService, getSellerOrdersService, updateOrderStatusService, cancelOrderService} from "../services/order.service.js";
 
 export const placeOrder = async (req, res, next)=>{
     try{
@@ -55,3 +55,20 @@ export const updateOrderStatus = async (req, res, next)=>{
         next(error);
     }
 }
+
+export const cancelOrder = async (req, res, next) => {
+  try {
+    const order = await cancelOrderService(
+      req.params.orderId,
+      req.user._id
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Order cancelled successfully",
+      data: order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

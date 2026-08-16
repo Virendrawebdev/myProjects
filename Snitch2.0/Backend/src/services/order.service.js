@@ -1,5 +1,6 @@
 import Cart from "../models/cart.model.js";
 import Order from "../models/order.model.js";
+import Product from "../models/product.model.js";
 import Seller from "../models/seller.model.js";
 import ApiError from "../utils/ApiError.js";
 
@@ -109,6 +110,52 @@ export const updateOrderStatusService = async (
   }
 
   order.orderStatus = orderStatus;
+
+  await order.save();
+
+  return order;
+};
+
+export const cancelOrderService = async (orderId, userId) => {
+  const order = await Order.findOne({
+    _id: orderId,
+    user: userId,
+  });
+
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  // Already cancelled?
+  if (order.orderStatus === "Cancelled") {
+    throw new ApiError(400, "Order is already cancelled");
+  }
+
+  // Don't allow cancellation after shipping
+  if (
+    order.orderStatus === "Shipped" ||
+    order.orderStatus === "Delivered"
+  ) {
+    throw new ApiError(
+      400,
+      "This order cannot be cancelled"
+    );
+  }
+
+  // Restore stock
+  for (const item of order.products) {
+    await Product.findOneAndUpdate(
+      { _id: item.product },
+      {
+        $inc: {
+          stock: item.quantity,
+        },
+      }
+    );
+  }
+
+  // Update order status
+  order.orderStatus = "Cancelled";
 
   await order.save();
 
