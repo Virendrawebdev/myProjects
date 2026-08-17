@@ -11,6 +11,7 @@ import wishlistRoutes from './routes/wishlist.routes.js'
 import aiRoutes from './routes/ai.routes.js'
 import reviewRoutes from "./routes/review.routes.js"
 import paymentsRoutes from "./routes/payment.routes.js"
+import dashboardRoutes from "./routes/dashbord.routes.js"
 
 
 const app = express();
@@ -37,6 +38,7 @@ app.use("/api/wishlist", wishlistRoutes)
 app.use("/api/ai", aiRoutes)
 app.use("/api/review", reviewRoutes)
 app.use("/api/payments", paymentsRoutes)
+app.use("/api/seller/dashboard", dashboardRoutes)
 app.use(errorHandler);
 
 export default app;
