@@ -28,7 +28,7 @@ const COLORS = [
 
 const OrderStatus = () => {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6">
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-zinc-900">
           Order Status
@@ -39,7 +39,7 @@ const OrderStatus = () => {
         </p>
       </div>
 
-      <div className="h-[280px]">
+      <div className="h-[230px] sm:h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

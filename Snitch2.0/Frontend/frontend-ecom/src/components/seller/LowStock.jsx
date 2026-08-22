@@ -18,7 +18,7 @@ const products = [
 
 const LowStock = () => {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+    <div className="min-w-0 rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6">
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-zinc-900">
           Low Stock
@@ -33,10 +33,10 @@ const LowStock = () => {
         {products.map((product) => (
           <div
             key={product.name}
-            className="flex items-center justify-between rounded-xl border border-zinc-100 p-3 transition hover:bg-zinc-50"
+            className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-zinc-100 p-3 transition hover:bg-zinc-50"
           >
-            <div>
-              <p className="text-sm font-medium text-zinc-900">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-zinc-900">
                 {product.name}
               </p>
 

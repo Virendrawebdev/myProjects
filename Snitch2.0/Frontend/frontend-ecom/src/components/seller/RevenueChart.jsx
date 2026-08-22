@@ -8,19 +8,20 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { day: "Mon", revenue: 12000 },
+
+const RevenueChart = ({data=[]}) => {
+
+  const chartData= data.length>0?data:[
+   { day: "Mon", revenue: 12000 },
   { day: "Tue", revenue: 18000 },
   { day: "Wed", revenue: 15000 },
   { day: "Thu", revenue: 22000 },
   { day: "Fri", revenue: 28000 },
   { day: "Sat", revenue: 24000 },
   { day: "Sun", revenue: 32000 },
-];
-
-const RevenueChart = () => {
+  ]
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6">
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-zinc-900">
           Revenue Overview
@@ -31,7 +32,7 @@ const RevenueChart = () => {
         </p>
       </div>
 
-      <div className="h-[320px] w-full">
+      <div className="h-[240px] w-full sm:h-[320px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <CartesianGrid
@@ -40,7 +41,7 @@ const RevenueChart = () => {
             />
 
             <XAxis
-              dataKey="day"
+              dataKey="_id"
               axisLine={false}
               tickLine={false}
             />

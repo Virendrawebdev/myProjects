@@ -43,9 +43,9 @@ const getStatusStyle = (status) => {
 
 const RecentOrders = () => {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white">
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white">
 
-      <div className="flex items-center justify-between border-b border-zinc-200 p-6">
+      <div className="flex items-center justify-between gap-4 border-b border-zinc-200 p-4 sm:p-6">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900">
             Recent Orders
@@ -56,13 +56,37 @@ const RecentOrders = () => {
           </p>
         </div>
 
-        <button className="text-sm font-medium text-zinc-900 hover:underline">
+        <button className="shrink-0 text-sm font-medium text-zinc-900 hover:underline">
           View all
         </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[650px] text-left">
+      <div className="divide-y divide-zinc-100 sm:hidden">
+        {orders.map((order) => (
+          <div key={order.id} className="space-y-3 px-4 py-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-zinc-900">{order.id}</p>
+                <p className="mt-1 truncate text-xs text-zinc-500">{order.customer}</p>
+              </div>
+              <span
+                className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium ${getStatusStyle(
+                  order.status
+                )}`}
+              >
+                {order.status}
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-3 text-xs">
+              <span className="truncate text-zinc-500">{order.product}</span>
+              <span className="shrink-0 font-semibold text-zinc-900">{order.amount}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden w-full overflow-x-auto overscroll-x-contain sm:block">
+        <table className="w-full min-w-xl text-left text-sm">
 
           <thead>
             <tr className="border-b border-zinc-100 text-xs uppercase tracking-wider text-zinc-400">

@@ -42,6 +42,34 @@ export const getsellerDashboardService = async (sellerUserId)=>{
             }
         }
     ])
+   // revenueOverview
+    const revenueOverview = await Order.aggregate([
+        {
+            $match:{
+                sellerUserId:sellerUserId,
+                orderStatus:"Delivered",
+            }
+        },
+        
+        {
+            $group:{
+                _id:{
+                    $dateToString:{
+                        format:"%Y-%m-%d",
+                        date:"$createdAt",
+                    }
+                },
+                revenue:{
+                    $sum:"$totalAmount"
+                }
+            }
+        },
+        {
+            $sort:{
+                _id:1,
+            }
+        }
+    ])
 
 
     return {
@@ -50,6 +78,7 @@ export const getsellerDashboardService = async (sellerUserId)=>{
         pendingOrders,
         deliveredOrders,
         totalSales:sales[0]?.totalSales||0,
+        revenueOverview,
         lowestStockProducts
     }
 
