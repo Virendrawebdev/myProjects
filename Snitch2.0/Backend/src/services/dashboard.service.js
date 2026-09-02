@@ -71,6 +71,25 @@ export const getsellerDashboardService = async (sellerUserId)=>{
         }
     ])
 
+    const recentOrders = await Order.find({
+        sellerUserId:sellerUserId,
+    }).sort({createdAt:-1}).limit(5).populate("user","fullName").select("_id totalAmount product orderStatus createdAt user")
+
+    const orderStatusOverview = await Order.aggregate([
+        {
+            $match:{
+                sellerUserId:sellerUserId
+            }
+        },
+        {
+            $group:{
+                _id:"$orderStatus",
+                count:{
+                    $sum:1
+                }
+            }
+        }
+    ])
 
     return {
         totalProducts,
@@ -79,7 +98,9 @@ export const getsellerDashboardService = async (sellerUserId)=>{
         deliveredOrders,
         totalSales:sales[0]?.totalSales||0,
         revenueOverview,
-        lowestStockProducts
+        lowestStockProducts,
+        recentOrders,
+        orderStatusOverview,
     }
 
 

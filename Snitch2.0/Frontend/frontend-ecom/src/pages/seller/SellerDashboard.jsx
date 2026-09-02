@@ -20,7 +20,7 @@ useEffect(() => {
   const fetchDashboard = async () => {
     try {
       const data = await getSellerDashboard();
-      console.log("DashBoard Data:", data.data)
+    //   console.log("DashBoard Data:", data.data)
       setDashboard(data.data);
         
     } catch (error) {
@@ -79,7 +79,7 @@ useEffect(() => {
                             change="+18.2%"
                             icon={DollarSign}
                         />
-
+                        
                         <StatCard
                             title="Total Orders"
                             value={`${dashboard?.totalOrders ||0}`}
@@ -110,10 +110,10 @@ useEffect(() => {
                     </div>
                     <div className="mt-4 grid min-w-0 gap-4 sm:mt-5 sm:gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
                       <RevenueChart data={dashboard.revenueOverview}/>
-                      <OrderStatus/>
+                      <OrderStatus data={dashboard.orderStatusOverview} />
                     </div>
                     <div className="mt-4 grid min-w-0 gap-4 sm:mt-6 sm:gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-                     <RecentOrders/>
+                     <RecentOrders orders={dashboard?.recentOrders || []}/>
                      <LowStock/>
                     </div>
                     </div>

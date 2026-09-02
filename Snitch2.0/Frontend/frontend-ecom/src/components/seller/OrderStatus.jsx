@@ -1,92 +1,81 @@
-import {PieChart, Pie,Cell,Tooltip,ResponsiveContainer,} from "recharts";
 
-const data = [
-  {
-    name: "Delivered",
-    value: 68,
-  },
-  {
-    name: "Shipped",
-    value: 18,
-  },
-  {
-    name: "Pending",
-    value: 10,
-  },
-  {
-    name: "Cancelled",
-    value: 4,
-  },
-];
+const OrderStatus = ({ data = [] }) => {
+  const getCount = (status) => {
+    const item = data.find((item) => item._id === status);
+    return item?.count || 0;
+  };
 
-const COLORS = [
-  "#18181b",
-  "#52525b",
-  "#a1a1aa",
-  "#e4e4e7",
-];
+  const statuses = [
+    "Pending",
+    "Confirmed",
+    "Shipped",
+    "Delivered",
+    "Cancelled",
+  ];
 
-const OrderStatus = () => {
+  const totalOrders = data.reduce(
+    (total, item) => total + item.count,
+    0
+  );
+
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6">
-      <div className="mb-4">
+      <div className="mb-6">
         <h2 className="text-lg font-semibold text-zinc-900">
           Order Status
         </h2>
 
-        <p className="mt-1 text-sm text-zinc-500">
-          Current order distribution
+        <p className="text-sm text-zinc-500">
+          Overview of your orders
         </p>
       </div>
 
-      <div className="h-[230px] sm:h-[280px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey="value"
-              nameKey="name"
-              innerRadius={70}
-              outerRadius={100}
-              paddingAngle={3}
-            >
-              {data.map((entry, index) => (
-                <Cell
-                  key={entry.name}
-                  fill={COLORS[index]}
-                />
-              ))}
-            </Pie>
+      <div className="space-y-5">
+        {statuses.map((status) => {
+          const count = getCount(status);
 
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
+          const percentage =
+            totalOrders > 0
+              ? Math.round((count / totalOrders) * 100)
+              : 0;
+
+          return (
+            <div key={status}>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-sm font-medium text-zinc-700">
+                  {status}
+                </span>
+
+                <span className="text-sm font-semibold text-zinc-900">
+                  {count}
+                </span>
+              </div>
+
+              <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
+                <div
+                  className="h-full rounded-full bg-zinc-900 transition-all duration-500"
+                  style={{ width:` ${percentage}% `}}
+                />
+              </div>
+
+              <p className="mt-1 text-right text-xs text-zinc-400">
+                {percentage}%
+              </p>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        {data.map((item, index) => (
-          <div
-            key={item.name}
-            className="flex items-center justify-between text-sm"
-          >
-            <div className="flex items-center gap-2">
-              <span
-                className="h-2.5 w-2.5 rounded-full"
-                style={{
-                  backgroundColor: COLORS[index],
-                }}
-              />
+      <div className="mt-6 border-t border-zinc-100 pt-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-zinc-500">
+            Total Orders
+          </span>
 
-              <span className="text-zinc-600">
-                {item.name}
-              </span>
-            </div>
-
-            <span className="font-medium text-zinc-900">
-              {item.value}%
-            </span>
-          </div>
-        ))}
+          <span className="text-lg font-bold text-zinc-900">
+            {totalOrders}
+          </span>
+        </div>
       </div>
     </div>
   );
