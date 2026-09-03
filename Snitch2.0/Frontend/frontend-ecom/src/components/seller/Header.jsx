@@ -1,6 +1,6 @@
 import { Bell, ChevronDown, Search } from "lucide-react";
 
-const Header = () => {
+const Header = ({ dashboard }) => {
   return (
     <header className="flex min-h-16 items-center justify-between gap-3 border-b border-zinc-200/80 bg-white/90 px-3 backdrop-blur sm:min-h-20 sm:px-6 lg:px-8">
 
@@ -36,7 +36,7 @@ const Header = () => {
 
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-zinc-900">
-              Virendra
+             {dashboard?.seller?.fullName || "Seller"}
             </p>
 
             <p className="text-xs text-zinc-500">

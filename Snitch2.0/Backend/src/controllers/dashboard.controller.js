@@ -3,7 +3,8 @@ import { getsellerDashboardService } from "../services/dashboard.service.js"
 
 export const getSellerDashboard = async(req, res, next)=>{
     try{
-    const dashboard = await getsellerDashboardService(req.user.sellerUserId)
+        const sellerUserId = req.user._id;
+    const dashboard = await getsellerDashboardService(sellerUserId);
 
     return res.status(200).json({
         success:true,

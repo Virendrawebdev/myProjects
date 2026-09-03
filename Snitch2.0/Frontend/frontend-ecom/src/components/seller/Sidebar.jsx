@@ -53,7 +53,7 @@ const storeMenu = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({dashboard}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -203,7 +203,7 @@ const Sidebar = () => {
 
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">
-              Virendra
+              {dashboard?.seller?.fullName || "Seller"}
             </p>
 
             <p className="text-xs text-white/40">
