@@ -13,16 +13,19 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const mainMenu = [
   {
     name: "Dashboard",
     icon: LayoutDashboard,
     active: true,
+    link: "/seller/dashboard",
   },
   {
     name: "Products",
     icon: Package,
+    link: "/seller/products",
   },
   {
     name: "Orders",
@@ -53,7 +56,7 @@ const storeMenu = [
   },
 ];
 
-const Sidebar = ({dashboard}) => {
+const Sidebar = ({ dashboard }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -89,9 +92,23 @@ const Sidebar = ({dashboard}) => {
             <nav className="flex-1 overflow-y-auto px-3 py-6">
               <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">Main menu</p>
               <div className="space-y-1.5">
-                {mainMenu.map((item) => {
+                {/* {mainMenu.map((item) => {
                   const Icon = item.icon;
                   return <button key={item.name} onClick={() => setIsMobileMenuOpen(false)} className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3.5 text-sm font-medium transition ${item.active ? "bg-[#e2f163] text-[#111110] shadow-[0_8px_24px_rgba(226,241,99,0.12)]" : "text-white/60 hover:bg-white/10 hover:text-white"}`}><Icon size={18} strokeWidth={item.active ? 2.5 : 2} /><span>{item.name}</span>{item.active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#111110]" />}</button>;
+                })} */}
+                {mainMenu.map((item) => {
+                  const Icon = item.icon;
+                  const itemClassName = "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900";
+
+                  return (
+                    item.link ? <Link key={item.name} to={item.link} onClick={() => setIsMobileMenuOpen(false)} className={itemClassName}>
+                      <Icon size={20} />
+                      <span>{item.name}</span>
+                    </Link> : <button key={item.name} type="button" onClick={() => setIsMobileMenuOpen(false)} className={itemClassName}>
+                      <Icon size={20} />
+                      <span>{item.name}</span>
+                    </button>
+                  );
                 })}
               </div>
               <p className="mb-3 mt-9 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">Store</p>
@@ -116,107 +133,108 @@ const Sidebar = ({dashboard}) => {
       )}
       <aside className="hidden min-h-screen w-64 shrink-0 flex-col bg-[#111110] text-white md:flex">
 
-      {/* Logo */}
-      <div className="flex h-20 items-center border-b border-white/10 px-6">
-        <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e2f163] text-sm font-bold text-[#111110]">
-            S
+        {/* Logo */}
+        <div className="flex h-20 items-center border-b border-white/10 px-6">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e2f163] text-sm font-bold text-[#111110]">
+              S
+            </div>
+
+            <span className="text-xl font-bold tracking-[0.2em]">
+              SNITCH2.0
+            </span>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-4 py-6">
+
+          {/* Main */}
+          <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-widest text-white/35">
+            Main
+          </p>
+
+          <div className="space-y-1">
+            {mainMenu.map((item) => {
+              const Icon = item.icon;
+              const itemClassName = `group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm transition-all ${item.active
+                  ? "bg-white text-[#0b1120] shadow-lg"
+                  : "text-white/60 hover:bg-white/10 hover:text-white"
+                }`;
+
+              return item.link ? (
+                <Link key={item.name} to={item.link} className={itemClassName}>
+                  <Icon
+                    size={18}
+                    strokeWidth={item.active ? 2.5 : 2}
+                  />
+                  <span>{item.name}</span>
+                </Link>
+              ) : (
+                <button key={item.name} type="button" className={itemClassName}>
+                  <Icon size={18} strokeWidth={item.active ? 2.5 : 2} />
+                  <span>{item.name}</span>
+                </button>
+              );
+            })}
           </div>
 
-          <span className="text-xl font-bold tracking-[0.2em]">
-            SNITCH2.0
-          </span>
-        </div>
-      </div>
+          {/* Store */}
+          <p className="mb-3 mt-8 px-3 text-[11px] font-semibold uppercase tracking-widest text-white/35">
+            Store
+          </p>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 py-6">
+          <div className="space-y-1">
+            {storeMenu.map((item) => {
+              const Icon = item.icon;
 
-        {/* Main */}
-        <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-widest text-white/35">
-          Main
-        </p>
+              return (
+                <button
+                  key={item.name}
+                  className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/60 transition-all hover:bg-white/10 hover:text-white"
+                >
+                  <Icon size={18} />
 
-        <div className="space-y-1">
-          {mainMenu.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <button
-                key={item.name}
-                className={`group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm transition-all ${
-                  item.active
-                    ? "bg-white text-[#0b1120] shadow-lg"
-                    : "text-white/60 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                <Icon
-                  size={18}
-                  strokeWidth={item.active ? 2.5 : 2}
-                />
-
-                <span>{item.name}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Store */}
-        <p className="mb-3 mt-8 px-3 text-[11px] font-semibold uppercase tracking-widest text-white/35">
-          Store
-        </p>
-
-        <div className="space-y-1">
-          {storeMenu.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <button
-                key={item.name}
-                className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/60 transition-all hover:bg-white/10 hover:text-white"
-              >
-                <Icon size={18} />
-
-                <span>{item.name}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* System */}
-        <p className="mb-3 mt-8 px-3 text-[11px] font-semibold uppercase tracking-widest text-white/35">
-          System
-        </p>
-
-        <button className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/60 transition-all hover:bg-white/10 hover:text-white">
-          <Settings size={18} />
-          <span>Settings</span>
-        </button>
-      </nav>
-
-      {/* Seller profile */}
-      <div className="border-t border-white/10 p-4">
-        <div className="flex items-center gap-3 rounded-xl p-2">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-[#0b1120]">
-            V
+                  <span>{item.name}</span>
+                </button>
+              );
+            })}
           </div>
 
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium">
-              {dashboard?.seller?.fullName || "Seller"}
-            </p>
+          {/* System */}
+          <p className="mb-3 mt-8 px-3 text-[11px] font-semibold uppercase tracking-widest text-white/35">
+            System
+          </p>
 
-            <p className="text-xs text-white/40">
-              Seller Account
-            </p>
+          <button className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm text-white/60 transition-all hover:bg-white/10 hover:text-white">
+            <Settings size={18} />
+            <span>Settings</span>
+          </button>
+        </nav>
+
+        {/* Seller profile */}
+        <div className="border-t border-white/10 p-4">
+          <div className="flex items-center gap-3 rounded-xl p-2">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-[#0b1120]">
+              V
+            </div>
+
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">
+                {dashboard?.seller?.fullName || "Seller"}
+              </p>
+
+              <p className="text-xs text-white/40">
+                Seller Account
+              </p>
+            </div>
+
+            <Bell
+              size={16}
+              className="ml-auto text-white/40"
+            />
           </div>
-
-          <Bell
-            size={16}
-            className="ml-auto text-white/40"
-          />
         </div>
-      </div>
       </aside>
     </>
   );
