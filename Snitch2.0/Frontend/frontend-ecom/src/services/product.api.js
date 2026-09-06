@@ -11,3 +11,15 @@ export const getSellerProducts = async () => {
     throw error;
   }
 };
+
+export const createProduct = async (productData) => {
+  try {
+    const response = await axios.post("/api/products/create", productData, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating product:", error);
+    throw error;
+  }
+};

@@ -13,13 +13,12 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const mainMenu = [
   {
     name: "Dashboard",
     icon: LayoutDashboard,
-    active: true,
     link: "/seller/dashboard",
   },
   {
@@ -57,6 +56,7 @@ const storeMenu = [
 ];
 
 const Sidebar = ({ dashboard }) => {
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -92,16 +92,14 @@ const Sidebar = ({ dashboard }) => {
             <nav className="flex-1 overflow-y-auto px-3 py-6">
               <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">Main menu</p>
               <div className="space-y-1.5">
-                {/* {mainMenu.map((item) => {
-                  const Icon = item.icon;
-                  return <button key={item.name} onClick={() => setIsMobileMenuOpen(false)} className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3.5 text-sm font-medium transition ${item.active ? "bg-[#e2f163] text-[#111110] shadow-[0_8px_24px_rgba(226,241,99,0.12)]" : "text-white/60 hover:bg-white/10 hover:text-white"}`}><Icon size={18} strokeWidth={item.active ? 2.5 : 2} /><span>{item.name}</span>{item.active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#111110]" />}</button>;
-                })} */}
+            
                 {mainMenu.map((item) => {
                   const Icon = item.icon;
+                  const isActive = item.link ? location.pathname === item.link || location.pathname.startsWith(`${item.link}/`) : false;
                   const itemClassName = "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900";
 
                   return (
-                    item.link ? <Link key={item.name} to={item.link} onClick={() => setIsMobileMenuOpen(false)} className={itemClassName}>
+                    item.link ? <Link to={item.link} key={item.name} onClick={() => setIsMobileMenuOpen(false)} className={itemClassName + (isActive ? " bg-zinc-100 text-zinc-900" : "")} aria-current={isActive ? "page" : undefined}>
                       <Icon size={20} />
                       <span>{item.name}</span>
                     </Link> : <button key={item.name} type="button" onClick={() => setIsMobileMenuOpen(false)} className={itemClassName}>
@@ -157,22 +155,23 @@ const Sidebar = ({ dashboard }) => {
           <div className="space-y-1">
             {mainMenu.map((item) => {
               const Icon = item.icon;
-              const itemClassName = `group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm transition-all ${item.active
+              const isActive = item.link ? location.pathname === item.link || location.pathname.startsWith(`${item.link}/`) : false;
+              const itemClassName = `group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm transition-all ${isActive
                   ? "bg-white text-[#0b1120] shadow-lg"
                   : "text-white/60 hover:bg-white/10 hover:text-white"
                 }`;
 
               return item.link ? (
-                <Link key={item.name} to={item.link} className={itemClassName}>
+                <Link key={item.name} to={item.link} className={itemClassName} aria-current={isActive ? "page" : undefined}>
                   <Icon
                     size={18}
-                    strokeWidth={item.active ? 2.5 : 2}
+                    strokeWidth={isActive ? 2.5 : 2}
                   />
                   <span>{item.name}</span>
                 </Link>
               ) : (
                 <button key={item.name} type="button" className={itemClassName}>
-                  <Icon size={18} strokeWidth={item.active ? 2.5 : 2} />
+                  <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
                   <span>{item.name}</span>
                 </button>
               );
@@ -216,7 +215,7 @@ const Sidebar = ({ dashboard }) => {
         <div className="border-t border-white/10 p-4">
           <div className="flex items-center gap-3 rounded-xl p-2">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-[#0b1120]">
-              V
+              S
             </div>
 
             <div className="min-w-0">
