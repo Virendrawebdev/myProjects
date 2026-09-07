@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { createProduct } from "../../services/product.api";
 
-const AddProductForm = ({ onClose }) => {
+const AddProductForm = ({ onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         productName: "",
         category: "",
@@ -46,7 +46,7 @@ const AddProductForm = ({ onClose }) => {
 
             console.log("Product created:", response);
             alert("Product created successfully!");
-            onClose();
+            onSuccess?.();
         } catch (error) {
             console.error("Create product error:", error);
             alert(error.response?.data?.message || error.response?.data?.error || "Failed to create product");

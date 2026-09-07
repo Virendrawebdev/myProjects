@@ -23,3 +23,27 @@ export const createProduct = async (productData) => {
     throw error;
   }
 };
+
+export const updateProduct = async (productId, productData) => {
+  try {
+    const response = await axios.patch(`/api/products/${productId}`, productData, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating product:", error);
+    throw error;
+  }
+};
+
+export const deleteProduct = async (productId) => {
+  try {
+    const response = await axios.delete(`/api/products/${productId}`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    throw error;
+  }
+};

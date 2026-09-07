@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { getSellerProducts } from "../../services/product.api";
+import { getSellerProducts , deleteProduct} from "../../services/product.api";
 import AddProductForm from "../../components/seller/AddProductForm";
 import Sidebar from "../../components/seller/Sidebar";
+import EditProductForm from "../../components/seller/EditProductForm";
+
+
 const Products = (dashboard) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingProduct, setEditingProduct] = useState(null); // State to hold the product being edited
 
   const productsPerPage = 4; // Number of products to display per page
 
@@ -16,23 +20,55 @@ const Products = (dashboard) => {
 
   const currentProducts = products.slice(startIndex, startIndex + productsPerPage);
 
-  useEffect(() => {
-    // yahan existing product API connect karenge
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const data = await getSellerProducts();
-        console.log("Fetched Products:", data);
-        setProducts(data.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const data = await getSellerProducts();
+      console.log("Fetched Products:", data);
+      setProducts(data.data || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProducts();
   }, []);
+
+  const handleAddSuccess = () => {
+    setShowForm(false);
+    fetchProducts();
+  };
+
+  const handleupdateSuccess = () => {
+    setEditingProduct(null);
+    fetchProducts();
+  };
+
+  const handleDelete = async (productId) => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this product?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await deleteProduct(productId);
+
+    await fetchProducts();
+
+    alert("Product deleted successfully!");
+  } catch (error) {
+    console.error("Delete product error:", error);
+
+    alert(
+      error.response?.data?.message || "Failed to delete product"
+    );
+  }
+};
 
   if (loading) {
     return (
@@ -42,6 +78,8 @@ const Products = (dashboard) => {
     );
   }
 
+  
+  
   return (
     <div className="sm:flex min-h-screen min-w-0 bg-[#f4f5ef]">
        <Sidebar dashboard={dashboard} />
@@ -68,9 +106,17 @@ const Products = (dashboard) => {
       </div>
       {
         showForm && (
-          <AddProductForm onClose={() => setShowForm(false)} />
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <AddProductForm onClose={() => setShowForm(false)} onSuccess={handleAddSuccess} />
+          </div>
         )
       }
+
+      {editingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <EditProductForm product={editingProduct} onClose={() => setEditingProduct(null)} onSuccess={handleupdateSuccess} />
+        </div>
+      )}
 
       <div className="rounded-2xl border bg-white *:border-zinc-200  ">
         {products.length === 0 ? (
@@ -123,11 +169,11 @@ const Products = (dashboard) => {
                   </div>
 
                   <div className="mt-4 flex gap-2">
-                    <button className="flex-1 rounded-xl border bg-green-500 border-zinc-200 px-3 py-2 text-sm font-medium *:text-white scroll-m-0 transition-colors hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer">
+                    <button onClick={()=>setEditingProduct(product)} className="flex-1 rounded-xl border bg-green-500 border-zinc-200 px-3 py-2 text-sm font-medium *:text-white scroll-m-0 transition-colors hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer">
                       Edit
                     </button>
 
-                    <button className="flex-1 rounded-xl bg-zinc-900 px-3 py-2 text-sm font-medium text-white scroll-m-0 transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 cursor-pointer">
+                    <button onClick={()=>handleDelete(product._id)} className="flex-1 rounded-xl bg-zinc-900 px-3 py-2 text-sm font-medium text-white scroll-m-0 transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 cursor-pointer">
                       Delete
                     </button>
                   </div>
