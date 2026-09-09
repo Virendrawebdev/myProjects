@@ -10,8 +10,7 @@ export const createProductSchema = z.object({
     brand: z.string().trim().min(2, "Brand is required"),
     category: z.string().trim().min(2, "Category is required"),
     price: z.coerce.number().positive("Price must be greater than 0"),
-    discountPrice: z.coerce.number().min(0, "Discount price cannot be negative").optional().or(z.literal("")),
+    discountPrice: z.coerce.number().min(0, "Discount price cannot be negative").optional().default(0),
     stock: z.coerce.number().int("Stock must be an integer").min(0, "Stock cannot be negative"),
-    images: z.array(z.string().trim().url("Invalid image URL"))
-        .min(1, "At least one image is required")
+    images: z.array(z.string().trim().url("Invalid image URL")).optional().default([])
 });

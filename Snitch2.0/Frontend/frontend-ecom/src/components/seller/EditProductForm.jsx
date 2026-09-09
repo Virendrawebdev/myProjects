@@ -106,7 +106,7 @@ const EditProductForm = ({ product, onClose, onSuccess }) => {
                     <label className="block text-sm font-medium text-zinc-700">
                         brand
                     </label>
-                    <textarea
+                    <input
                         name="brand"
                         value={formData.brand}
                         onChange={handleInputChange}
@@ -118,7 +118,7 @@ const EditProductForm = ({ product, onClose, onSuccess }) => {
                     <label className="block text-sm font-medium text-zinc-700">
                         category
                     </label>
-                    <textarea
+                    <input
                         name="category"
                         value={formData.category}
                         onChange={handleInputChange}
