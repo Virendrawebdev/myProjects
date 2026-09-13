@@ -4,6 +4,7 @@ import Login from './pages/auth/Login';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Register from './pages/auth/Register';
 import Products from './pages/seller/Products';
+import Orders from './pages/seller/Order';
 
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
    <Route element={<ProtectedRoute/>}>
   <Route path='/seller/dashboard' element={<SellerDashboard/>}/>
   <Route path='/seller/products' element={<Products/>}/>
+  <Route path='/seller/orders' element={<Orders/>}/>
   </Route>
    </Routes>
   )

@@ -29,6 +29,7 @@ const mainMenu = [
   {
     name: "Orders",
     icon: ShoppingBag,
+    link: "/seller/orders",
   },
   {
     name: "Customers",

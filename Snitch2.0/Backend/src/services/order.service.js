@@ -2,6 +2,7 @@ import Cart from "../models/cart.model.js";
 import Order from "../models/order.model.js";
 import Product from "../models/product.model.js";
 import Seller from "../models/seller.model.js";
+import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 
 export const placeOrderService = async(userId, shippingAddress, paymentMethod) => {
@@ -81,6 +82,12 @@ export const updateOrderStatusService = async (
   sellerUserId,
   orderStatus
 ) => {
+  const validStatuses = ["Pending", "Confirmed", "Shipped", "Delivered", "Cancelled"];
+
+  if (!orderStatus || !validStatuses.includes(orderStatus)) {
+    throw new ApiError(400, "Invalid order status");
+  }
+
   const seller = await Seller.findOne({ user: sellerUserId });
   if (!seller) {
     throw new ApiError(404, "Seller profile not found");
@@ -117,13 +124,36 @@ export const updateOrderStatusService = async (
 };
 
 export const cancelOrderService = async (orderId, userId) => {
-  const order = await Order.findOne({
-    _id: orderId,
-    user: userId,
+  const order = await Order.findById(orderId).populate({
+    path: "products.product",
+    populate: {
+      path: "seller",
+    },
   });
 
   if (!order) {
     throw new ApiError(404, "Order not found");
+  }
+
+  const actingUser = await User.findById(userId).select("role");
+  const isBuyer = order.user.toString() === userId.toString();
+
+  let isSellerOrder = false;
+  if (actingUser?.role === "seller") {
+    const seller = await Seller.findOne({ user: userId });
+    if (seller) {
+      isSellerOrder = order.products.some((item) => {
+        return (
+          item.product &&
+          item.product.seller &&
+          item.product.seller.toString() === seller._id.toString()
+        );
+      });
+    }
+  }
+
+  if (!isBuyer && !isSellerOrder) {
+    throw new ApiError(403, "Access denied");
   }
 
   // Already cancelled?
@@ -136,22 +166,21 @@ export const cancelOrderService = async (orderId, userId) => {
     order.orderStatus === "Shipped" ||
     order.orderStatus === "Delivered"
   ) {
-    throw new ApiError(
-      400,
-      "This order cannot be cancelled"
-    );
+    throw new ApiError(400, "This order cannot be cancelled");
   }
 
   // Restore stock
   for (const item of order.products) {
-    await Product.findOneAndUpdate(
-      { _id: item.product },
-      {
-        $inc: {
-          stock: item.quantity,
-        },
-      }
-    );
+    if (item.product) {
+      await Product.findOneAndUpdate(
+        { _id: item.product._id || item.product },
+        {
+          $inc: {
+            stock: item.quantity,
+          },
+        }
+      );
+    }
   }
 
   // Update order status

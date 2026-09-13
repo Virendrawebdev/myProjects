@@ -45,7 +45,8 @@ export const getSellerOrders = async (req, res, next)=>{
 
 export const updateOrderStatus = async (req, res, next)=>{
     try{
-        const order = await updateOrderStatusService(req.params.orderId, req.user._id, req.body.orderStatus);
+        const orderStatus = req.body.orderStatus ?? req.body.status;
+        const order = await updateOrderStatusService(req.params.orderId, req.user._id, orderStatus);
         return res.status(200).json({
             success: true,
             message: "Order status updated successfully",
