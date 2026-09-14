@@ -47,3 +47,13 @@ export const deleteProduct = async (productId) => {
     throw error;
   }
 };
+
+export const getAllProducts = async () => {
+  try {
+    const response = await axios.get("/api/products");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all products:", error);
+    throw error;
+  }
+};

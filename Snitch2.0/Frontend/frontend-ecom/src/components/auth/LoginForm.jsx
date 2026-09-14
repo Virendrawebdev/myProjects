@@ -20,10 +20,14 @@ const LoginForm = () => {
 
       const response = await loginUser(email, password);
 
-      if (response?.data?.role === "seller") {
+      const user = response?.data;
+
+      if (user?.role === "seller") {
         navigate("/seller/dashboard");
+      } else if (user?.role === "buyer") {
+        navigate("/customer/orders");
       } else {
-        setError("Only seller accounts can access this dashboard.");
+        setError("Your account type is not recognized.");
       }
     } catch (error) {
       console.error(error);

@@ -1,5 +1,6 @@
 import axios from "axios";
 
+//seller
 export const getSellerOrders = async () => {
   const response = await axios.get("/api/orders/seller", {
     withCredentials: true,
@@ -28,3 +29,11 @@ export const cancelOrder = async (orderId) => {
   );
   return response.data;
 };
+
+// customer
+export const getMyOrders = async()=>{
+  const response = await axios.get("/api/orders/my-orders", {
+    withCredentials: true,
+  });
+  return response.data;
+}

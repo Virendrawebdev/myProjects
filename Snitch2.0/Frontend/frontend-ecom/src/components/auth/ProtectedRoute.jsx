@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { getCurrentUser } from "../../services/auth.api";
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ allowedRoles }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const response = await getCurrentUser();
-
         setUser(response?.data);
       } catch (error) {
         console.error("Authentication failed:", error);
@@ -34,7 +34,12 @@ const ProtectedRoute = () => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    const redirectPath = user.role === "seller" ? "/seller/dashboard" : "/customer/orders";
+    return <Navigate to={redirectPath} replace />;
   }
 
   return <Outlet />;
