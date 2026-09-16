@@ -25,7 +25,7 @@ const LoginForm = () => {
       if (user?.role === "seller") {
         navigate("/seller/dashboard");
       } else if (user?.role === "buyer") {
-        navigate("/customer/orders");
+        navigate("/customer/CustomerProducts");
       } else {
         setError("Your account type is not recognized.");
       }

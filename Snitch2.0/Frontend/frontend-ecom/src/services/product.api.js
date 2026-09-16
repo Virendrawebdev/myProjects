@@ -47,13 +47,23 @@ export const deleteProduct = async (productId) => {
     throw error;
   }
 };
-
+//customer
 export const getAllProducts = async () => {
   try {
     const response = await axios.get("/api/products");
     return response.data;
   } catch (error) {
     console.error("Error fetching all products:", error);
+    throw error;
+  }
+};
+
+export const getProductById = async (productId) => {
+  try {
+    const response = await axios.get(`/api/products/${productId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching product by ID:", error);
     throw error;
   }
 };
