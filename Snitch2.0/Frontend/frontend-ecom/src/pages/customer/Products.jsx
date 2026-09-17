@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getAllProducts } from "../../services/product.api";
-import { addToWishlist, getWishlist, removeFromWishlist } from "../../services/wistlist.api";
+import { addToWishlist, getWishlist, removeFromWishlist } from "../../services/wishlist.api";
 import CustomerHeader from "../../components/customer/CustomerHeader";
 import { useNavigate } from "react-router-dom";
 
@@ -37,7 +37,11 @@ const Products = () => {
     const fetchWishlist = async () => {
       try {
         const response = await getWishlist();
-        const wishlistItems = response?.data?.products || response?.data || [];
+        const wishlistPayload = response?.data?.data ?? response?.data ?? [];
+        const wishlistItems = Array.isArray(wishlistPayload)
+          ? wishlistPayload
+          : wishlistPayload?.products ?? [];
+
         const ids = wishlistItems.map((item) => {
           if (typeof item === "string") return item;
           return item?.product?._id || item?.product;
@@ -49,6 +53,23 @@ const Products = () => {
     };
 
     fetchWishlist();
+  }, []);
+
+  useEffect(() => {
+    const handleWishlistChange = (event) => {
+      const { productId, wishlisted } = event.detail || {};
+      if (!productId) return;
+
+      setWishlistProductIds((prev) => {
+        if (wishlisted) {
+          return prev.includes(productId) ? prev : [...prev, productId];
+        }
+        return prev.filter((id) => String(id) !== String(productId));
+      });
+    };
+
+    window.addEventListener("wishlist:changed", handleWishlistChange);
+    return () => window.removeEventListener("wishlist:changed", handleWishlistChange);
   }, []);
 
   useEffect(() => {
@@ -64,13 +85,27 @@ const Products = () => {
 
     try {
       if (isProductInWishlist) {
-        await removeFromWishlist(productId);
         setWishlistProductIds((prev) => prev.filter((id) => id !== productId));
+        window.dispatchEvent(
+          new CustomEvent("wishlist:changed", {
+            detail: { productId: String(productId), wishlisted: false },
+          })
+        );
+        await removeFromWishlist(productId);
       } else {
-        await addToWishlist(productId);
         setWishlistProductIds((prev) => [...prev, productId]);
+        window.dispatchEvent(
+          new CustomEvent("wishlist:changed", {
+            detail: { productId: String(productId), wishlisted: true },
+          })
+        );
+        await addToWishlist(productId);
       }
     } catch (error) {
+      setWishlistProductIds((prev) => {
+        if (isProductInWishlist) return [...prev, productId];
+        return prev.filter((id) => id !== productId);
+      });
       console.error("Wishlist toggle error:", error);
     }
   };

@@ -8,6 +8,7 @@ import SellerOrders from './pages/seller/Order';
 import CustomerOrders from './pages/customer/Order';
 import CustomerProducts from './pages/customer/Products';
 import ProductDetails from './pages/customer/ProductDetails';
+import Wishlist from './pages/customer/Wishlist';
 
 const App = () => {
   return (
@@ -20,7 +21,7 @@ const App = () => {
         <Route path='/customer/CustomerProducts' element={<CustomerProducts />} />
         <Route path='/customer/orders' element={<CustomerOrders />} />
         <Route path='/customer/product/:productId' element={<ProductDetails />} />
-
+        <Route path='/customer/Wishlist' element={<Wishlist />} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['seller']} />}>
