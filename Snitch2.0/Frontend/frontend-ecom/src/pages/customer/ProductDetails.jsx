@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getProductById } from "../../services/product.api";
 import CustomerHeader from "../../components/customer/CustomerHeader";
 import { addToWishlist, getWishlist, removeFromWishlist } from "../../services/wishlist.api";
+import { addToCart } from "../../services/cart.api";
 
 const ProductDetails = () => {
     const { productId } = useParams();
@@ -42,7 +43,7 @@ const ProductDetails = () => {
         const fetchProduct = async () => {
             try {
                 const response = await getProductById(productId);
-                console.log("Product details:", response);
+                // console.log("Product details:", response);
 
                 setProduct(response.data);
             } catch (error) {
@@ -105,6 +106,21 @@ const ProductDetails = () => {
         return <div className="p-6">Product not found</div>;
     }
 
+    const handleAddToCart = async () => {
+        try {
+            await addToCart(product._id, quantity);
+
+            alert("Product added to cart 🛒");
+        } catch (error) {
+            console.error("Add to cart error:", error);
+
+            alert(
+                error.response?.data?.message ||
+                "Failed to add product to cart"
+            );
+        }
+    };
+
     return (
         <>
             <CustomerHeader />
@@ -134,12 +150,12 @@ const ProductDetails = () => {
                             <p className="text-sm text-zinc-500">
                                 {product.brand}
                             </p>
-                            
+
 
                             <h1 className="mt-2 text-3xl font-semibold text-zinc-900">
                                 {product.productName}
                             </h1>
-                           
+
                             <p className="mt-4 text-2xl font-semibold text-zinc-900">
                                 ₹{product.Price || product.price}
                             </p>
@@ -208,7 +224,7 @@ const ProductDetails = () => {
                             </p>
 
                             <div className="mt-8 flex gap-3">
-                                <button className="flex-1 rounded-full border border-zinc-900 bg-white px-6 py-3 font-medium text-zinc-900">
+                                <button onClick={handleAddToCart} className="flex-1 rounded-full border border-zinc-900 bg-white px-6 py-3 font-medium text-zinc-900">
                                     Add to Cart
                                 </button>
 

@@ -9,6 +9,8 @@ import CustomerOrders from './pages/customer/Order';
 import CustomerProducts from './pages/customer/Products';
 import ProductDetails from './pages/customer/ProductDetails';
 import Wishlist from './pages/customer/Wishlist';
+import Cart from './pages/customer/Cart';
+import Checkout from './pages/customer/Checkout';
 
 const App = () => {
   return (
@@ -22,6 +24,8 @@ const App = () => {
         <Route path='/customer/orders' element={<CustomerOrders />} />
         <Route path='/customer/product/:productId' element={<ProductDetails />} />
         <Route path='/customer/Wishlist' element={<Wishlist />} />
+        <Route path='/customer/cart' element={<Cart/>} />
+        <Route path='/customer/checkout' element={<Checkout/>} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['seller']} />}>

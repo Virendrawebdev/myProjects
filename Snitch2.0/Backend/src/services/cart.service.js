@@ -8,7 +8,7 @@ export const addToCartService = async (userId, productId, quantity) => {
     if (!product) {
         throw new ApiError(404, "Product not found");
     }
-    const cart = await Cart.findOne({ user: userId });
+    let cart = await Cart.findOne({ user: userId });
     
     if(!cart){
         cart = await Cart.create({

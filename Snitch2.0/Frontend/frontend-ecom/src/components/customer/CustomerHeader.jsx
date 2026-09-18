@@ -38,9 +38,11 @@ const CustomerHeader = () => {
 
         {/* Actions */}
         <div className="ml-auto flex items-center gap-2 sm:gap-4">
+        <Link  to="/customer/Cart">
           <button type="button" aria-label="Open cart" className="rounded-full p-2 text-zinc-700 transition hover:bg-zinc-100">
             <ShoppingBag size={19} strokeWidth={1.8} />
           </button>
+         </Link>
           <button type="button" aria-label="Account" className="hidden h-9 w-9 items-center justify-center rounded-full bg-zinc-900 text-sm text-white sm:flex">
             V
           </button>
