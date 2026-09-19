@@ -126,14 +126,14 @@ const ProductDetails = () => {
             <CustomerHeader />
             <div className="min-h-screen bg-zinc-50 p-4">
                 <div className="mx-auto max-w-6xl">
-                    <div className="grid gap-8 md:grid-cols-2">
+                    <div className="grid gap-4 md:grid-cols-2">
 
                         {/* Image */}
                         <div className="relative overflow-hidden rounded-2xl bg-white">
                             <img
                                 src={product.images?.[0]}
                                 alt={product.productName}
-                                className="h-full max-h-[600px] w-full object-cover"
+                                className="h-full max-h-[600px] min-h-[180px] w-full object-cover"
                             />
                             <button
                                 type="button"
@@ -152,24 +152,24 @@ const ProductDetails = () => {
                             </p>
 
 
-                            <h1 className="mt-2 text-3xl font-semibold text-zinc-900">
+                            <h1 className="mt-1 text-3xl font-semibold text-zinc-900">
                                 {product.productName}
                             </h1>
 
-                            <p className="mt-4 text-2xl font-semibold text-zinc-900">
+                            <p className="mt-2 text-2xl font-semibold text-zinc-900">
                                 ₹{product.Price || product.price}
                             </p>
 
-                            <p className="mt-4 text-2xl font-semibold text-zinc-900">
+                            <p className="mt-2 text-2xl font-semibold text-zinc-900">
                                 ₹{product.discountPrice || product.price} Off
                             </p>
 
-                            <p className="mt-6 leading-7 text-zinc-600">
+                            <p className="mt-2 leading-7 text-zinc-600">
                                 {product.description}
                             </p>
 
                             {/* Size */}
-                            <div className="mt-6">
+                            <div className="mt-2">
                                 <p className="mb-3 text-sm font-medium text-zinc-900">
                                     Select Size
                                 </p>
@@ -191,7 +191,7 @@ const ProductDetails = () => {
                             </div>
 
                             {/* Quantity */}
-                            <div className="mt-6">
+                            <div className="mt-2">
                                 <p className="mb-3 text-sm font-medium text-zinc-900">
                                     Quantity
                                 </p>
@@ -219,11 +219,11 @@ const ProductDetails = () => {
                                 </div>
                             </div>
 
-                            <p className="mt-4 text-sm text-zinc-500">
+                            <p className="mt-2 text-sm text-zinc-500">
                                 Stock: {product.stock}
                             </p>
 
-                            <div className="mt-8 flex gap-3">
+                            <div className="mt-4 flex gap-3">
                                 <button onClick={handleAddToCart} className="flex-1 rounded-full border border-zinc-900 bg-white px-6 py-3 font-medium text-zinc-900">
                                     Add to Cart
                                 </button>

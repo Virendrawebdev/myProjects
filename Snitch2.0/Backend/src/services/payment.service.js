@@ -60,11 +60,12 @@ export const confirmOrderAfterPaymentService = async (
   }
 
   // find order
-  const order = await Order.findOneAndUpdate(
+  const order = await Order.findOne(
     {
       _id: payment.order,
       user: userId,
-    });
+    }
+  );
 
   if (!order) {
     throw new ApiError(404, "Order not found");

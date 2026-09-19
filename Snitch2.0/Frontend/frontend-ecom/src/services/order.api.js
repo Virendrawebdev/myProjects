@@ -37,3 +37,18 @@ export const getMyOrders = async()=>{
   });
   return response.data;
 }
+
+export const placeOrder = async (shippingAddress, paymentMethod) => {
+  const response = await axios.post(
+    "/api/orders",
+    {
+      shippingAddress,
+      paymentMethod,
+    },
+    {
+      withCredentials: true,
+    }
+  );
+
+  return response.data;
+};

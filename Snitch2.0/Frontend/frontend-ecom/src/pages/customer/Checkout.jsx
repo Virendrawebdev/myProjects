@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate } from "react-router-dom";
+import { placeOrder } from "../../services/order.api"
 
 
 const Checkout = () => {
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [address, setAddress] = useState({
         fullName: "",
         phone: "",
@@ -21,11 +24,33 @@ const Checkout = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = async (e) => {
+  e.preventDefault();
 
-        console.log("Delivery Address:", address);
-    };
+  try {
+    setLoading(true);
+
+    const response = await placeOrder(
+      address,
+      "Mock"
+    );
+
+    const orderId = response.data._id;
+
+        navigate("/customer/payment", {
+      state: { orderId },
+    });
+  } catch (error) {
+    console.error("Place order error:", error);
+
+    alert(
+      error.response?.data?.message ||
+        "Failed to place order"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
     return (
         <div className="min-h-screen bg-zinc-50 p-3">
@@ -103,16 +128,17 @@ const Checkout = () => {
                         </div>
 
                         <button
+                            disabled={loading}
                             type="submit"
                             className="mt-6 w-full rounded-full bg-zinc-900 py-3 font-medium text-white hover:bg-zinc-800"
                         >
-                            Continue to Payment
+                           {loading ? "Creating Order..." : "Continue to Payment"}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-    
+
     );
 };
 
