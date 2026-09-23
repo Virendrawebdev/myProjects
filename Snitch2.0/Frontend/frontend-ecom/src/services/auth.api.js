@@ -37,3 +37,10 @@ export const getCurrentUser = async()=>{
     })
     return response.data
 }
+
+export const logoutUser = async()=>{
+    const response = await axios.post("/api/auth/logout",{},{
+        withCredentials:true,
+    })
+    return response.data
+}

@@ -13,6 +13,7 @@ import Cart from './pages/customer/Cart';
 import Checkout from './pages/customer/Checkout';
 import Payment from './pages/customer/Payment';
 import OrderSuccess from './pages/customer/OrderSuccess';
+import AIRecommend from './pages/customer/AIRecommend';
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
         <Route path='/customer/checkout' element={<Checkout/>} />
         <Route path='/customer/payment' element={<Payment/>} />
         <Route path='/customer/order-success' element={<OrderSuccess/>} />
+        <Route path="/customer/ai-recommend" element={<AIRecommend/>} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['seller']} />}>

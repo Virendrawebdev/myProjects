@@ -12,9 +12,9 @@ const Payment = () => {
 
     const orderId = location.state?.orderId;
 
-    const [paymentMethod, setPaymentMethod]=useState("Mock")
 
     const [loading, setLoading] = useState(false);
+    const [paymentMethod, setPaymentMethod]=useState("Mock")
 
     const handlePayment = async () => {
         if (!orderId) {

@@ -3,33 +3,94 @@ import RegisterForm from "../../components/auth/RegisterForm";
 
 const Register = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-4 py-4">
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
+<div className="min-h-screen bg-zinc-950">
+      <div className="grid min-h-screen lg:grid-cols-2">
 
-        <div className="mb-5">
-          <p className="text-sm font-medium text-zinc-500">
-            Snitch 2.0
-          </p>
+        {/* Left - Brand Visual */}
+        <div className="relative hidden overflow-hidden lg:block">
+          <img
+            src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1200&q=80"
+            alt="Snitch fashion"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
 
-          <h1 className="mt-1 text-3xl font-semibold text-zinc-900">
-            Create account
-          </h1>
+          <div className="absolute inset-0 bg-black/45" />
+ 
+          <div className="relative flex h-full flex-col justify-between p-10 xl:p-14">
+            <Link
+              to="/"
+              className="text-2xl font-bold tracking-[0.25em] text-white"
+            >
+              SNITCH
+            </Link>
 
-          <p className="mt-1 text-sm text-zinc-500">
-            Join Snitch and start shopping or selling.
-          </p>
+            <div className="max-w-md text-white">
+              <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-white/70">
+                Your style. Your way.
+              </p>
+
+              <h2 className="text-4xl font-semibold leading-tight xl:text-5xl">
+                Create your
+                <br />
+                own style.
+              </h2>
+
+              <p className="mt-5 max-w-sm text-sm leading-6 text-white/70">
+                Join Snitch 2.0 and discover fashion made for
+                your everyday style.
+              </p>
+            </div>
+
+            <p className="text-xs text-white/50">
+              © 2026 SNITCH 2.0
+            </p>
+          </div>
         </div>
 
-        <RegisterForm />
+        {/* Right - Register */}
+        <div className="flex min-h-screen items-center justify-center bg-white px-5 py-10 sm:px-8">
+          <div className="w-full max-w-md">
 
-        <div className="mt-3 text-center text-sm text-zinc-500">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-medium text-zinc-900 hover:underline"
-          >
-            Sign in
-          </Link>
+            {/* Mobile Logo */}
+            <div className="mb-10 lg:hidden">
+              <Link
+                to="/"
+                className="text-2xl font-bold tracking-[0.25em] text-zinc-950"
+              >
+                SNITCH
+              </Link>
+            </div>
+
+            {/* Header */}
+            <div className="mb-8">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400">
+                Get started
+              </p>
+
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">
+                Create your account
+              </h1>
+
+              <p className="mt-3 text-sm leading-6 text-zinc-500">
+                Join Snitch 2.0 and start your fashion journey.
+              </p>
+            </div>
+
+            {/* Existing Form */}
+            <RegisterForm />
+
+            {/* Login */}
+            <div className="mt-8 border-t border-zinc-100 pt-6 text-center text-sm text-zinc-500">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-semibold text-zinc-950 hover:underline"
+              >
+                Sign in
+              </Link>
+            </div>
+
+          </div>
         </div>
 
       </div>

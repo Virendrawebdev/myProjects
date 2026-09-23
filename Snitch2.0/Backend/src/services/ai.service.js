@@ -8,25 +8,27 @@ const ai = new GoogleGenAI({
 
 export const recommendProductService = async (prompt) => {
   const products = await Product.find({})
-    .select("productName description category price discountPrice")
+    .select("productName description category price discountPrice images brand")
     .limit(10);
 
   if (!products.length) {
     return [];
   }
+
   const productData = products.map((product) => ({
-    productId: product._id,
+    productId: product._id.toString(),
     productName: product.productName,
     description: product.description,
     category: product.category,
     price: product.price,
     discountPrice: product.discountPrice,
+    brand: product.brand,
+    images: Array.isArray(product.images) ? product.images : [],
   }));
 
-
-const response = await ai.models.generateContent({
-  model: "gemini-2.5-flash",
-  contents: `
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: `
 User requirement:
 ${prompt}
 
@@ -46,30 +48,52 @@ Return ONLY valid JSON in this format:
 
 Recommend only products from the available products.
 `,
-});
+  });
 
-const text = response.text
-.replace(/```json/g, "")
-.replace(/```/g, "")
-.trim();
+  const text = (response?.text || "")
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
 
-const result = JSON.parse(text);
+  let result;
+  try {
+    result = JSON.parse(text);
+  } catch (error) {
+    console.error("Invalid AI recommendation payload:", text);
+    return [];
+  }
 
-const productIds =result.recommendations.map((item)=>item.productId);
+  const recommendations = Array.isArray(result?.recommendations)
+    ? result.recommendations
+    : [];
 
-const recommendedProducts = await Product.find({
-  _id:{$in:productIds}
-}).select("productName description category price discountPrice");
-const finalProducts = recommendedProducts.map((product) => {
-  const recommendation = result.recommendations.find(
-    (item) => item.productId === product._id.toString()
+  const productIds = recommendations
+    .map((item) => item?.productId)
+    .filter(Boolean);
+
+  if (!productIds.length) {
+    return [];
+  }
+
+  const recommendedProducts = await Product.find({
+    _id: { $in: productIds },
+  }).select("productName description category price discountPrice images brand");
+
+  const map = new Map(
+    recommendedProducts.map((product) => [product._id.toString(), product.toObject()])
   );
 
-  return {
-    ...product.toObject(),
-    reason: recommendation?.reason,
-  };
-});
+  const finalProducts = recommendations
+    .map((item) => {
+      const product = map.get(String(item.productId));
+      if (!product) return null;
 
-return finalProducts;
+      return {
+        ...product,
+        reason: item.reason || "Recommended for you",
+      };
+    })
+    .filter(Boolean);
+
+  return finalProducts;
 };

@@ -1,12 +1,29 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { AstroidIcon, Menu, Search, ShoppingBag, UserRound, X,  } from "lucide-react";
+import { logoutUser } from "../../services/auth.api";
 
 const CustomerHeader = () => {
+
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const closeMenu = () => setIsMenuOpen(false);
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
 
+      alert("Logout successful");
+
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+
+      alert(
+        error.response?.data?.message || "Logout failed"
+      );
+    }
+  };
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white">
       <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
@@ -34,17 +51,24 @@ const CustomerHeader = () => {
           <Link to="/customer/orders" className="text-sm text-zinc-700 hover:text-black">
             Orders
           </Link>
+          <Link to="/customer/ai-recommend" className="text-sm text-zinc-700 hover:text-black">
+            AI Style
+          </Link>
         </nav>
 
         {/* Actions */}
         <div className="ml-auto flex items-center gap-2 sm:gap-4">
-        <Link  to="/customer/Cart">
-          <button type="button" aria-label="Open cart" className="rounded-full p-2 text-zinc-700 transition hover:bg-zinc-100">
-            <ShoppingBag size={19} strokeWidth={1.8} />
-          </button>
-         </Link>
-          <button type="button" aria-label="Account" className="hidden h-9 w-9 items-center justify-center rounded-full bg-zinc-900 text-sm text-white sm:flex">
-            V
+          <Link to="/customer/Cart">
+            <button type="button" aria-label="Open cart" className="rounded-full p-2 text-zinc-700 transition hover:bg-zinc-100">
+              <ShoppingBag size={19} strokeWidth={1.8} />
+            </button>
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="h-6 w-15 rounded bg-red-500 text-sm text-white"
+            title="Logout"
+          >
+            Logout
           </button>
           <button
             type="button"
@@ -61,11 +85,11 @@ const CustomerHeader = () => {
       <div className="border-t border-zinc-100 px-4 py-3 md:hidden">
         <div className="relative">
           <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="w-full rounded-full border border-zinc-200 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-zinc-900"
-        />
+          <input
+            type="text"
+            placeholder="Search products..."
+            className="w-full rounded-full border border-zinc-200 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-zinc-900"
+          />
         </div>
       </div>
 
@@ -79,6 +103,9 @@ const CustomerHeader = () => {
           </Link>
           <Link to="/customer/orders" onClick={closeMenu} className="flex items-center gap-3 py-3 text-sm text-zinc-800">
             <UserRound size={17} /> Orders
+          </Link>
+          <Link to="/customer/ai-recommend" onClick={closeMenu} className="flex items-center gap-3 py-3 text-sm text-zinc-800">
+            <AstroidIcon size={17} /> AI Style
           </Link>
         </nav>
       )}
