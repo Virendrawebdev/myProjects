@@ -44,15 +44,15 @@ const CustomerOrders = () => {
     };
 
     if (loading) {
-        return <div className="mt-6 text-center text-sm text-zinc-500">Loading your orders...</div>;
+        return <><CustomerHeader /><div className="mt-6 text-center text-sm text-zinc-500">Loading your orders...</div></>;
     }
 
     if (error) {
-        return <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>;
+        return <><CustomerHeader /><div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div></>;
     }
 
     if (!orders.length) {
-        return <div className="mt-6 rounded-2xl border border-dashed border-zinc-300 bg-white p-8 text-center text-sm text-zinc-500">No orders yet.</div>;
+        return <><CustomerHeader /><div className="mt-6 rounded-2xl border border-dashed border-zinc-300 bg-white p-8 text-center text-sm text-zinc-500">No orders yet.</div></>;
     }
 
     return (

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/auth.api";
+import ContinueWithGoogle from "./ContinueWithGoogle";
 
 
 const LoginForm = () => {
@@ -34,7 +35,7 @@ const LoginForm = () => {
 
       setError(
         error?.response?.data?.message ||
-          "Login failed. Please check your email and password."
+        "Login failed. Please check your email and password."
       );
     } finally {
       setLoading(false);
@@ -71,7 +72,10 @@ const LoginForm = () => {
           required
           className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none transition focus:border-zinc-900"
         />
+
+      
       </div>
+       <ContinueWithGoogle/>
 
       {error && (
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
@@ -87,7 +91,7 @@ const LoginForm = () => {
         {loading ? "Signing in..." : "Sign in"}
       </button>
     </form>
-    
+
   );
 };
 

@@ -92,8 +92,24 @@ export const refreshAccessTokenService = async (incomingRefreshToken) => {
   await user.save({
     validateBeforeSave: false,
   });
+}
+
+  export const googleAuthService = async (user) => {
+  if (!user) {
+    throw new Error("Google authentication failed");
+  }
+
+  const accessToken = await user.generateAccessToken();
+  const refreshToken = await user.generateRefreshToken();
+
+  user.refreshToken = refreshToken;
+
+  await user.save({
+    validateBeforeSave: false,
+  });
 
   return {
+    user,
     accessToken,
     refreshToken,
   };

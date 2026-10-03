@@ -1,24 +1,40 @@
 import express from 'express';
-import authRoutes from './routes/auth.routes.js'
+import session from 'express-session';
+import authRoutes from './routes/auth.routes.js';
 import errorHandler from './middleware/error.middleware.js';
 import cookieParser from 'cookie-parser';
-import sellerRoutes from './routes/seller.routes.js'
-import productRoutes from './routes/product.routes.js'
-import cartRoutes from './routes/cart.routes.js'
-import checkoutRoutes from './routes/checkout.routes.js'
-import orderRoutes from './routes/order.routes.js'
-import wishlistRoutes from './routes/wishlist.routes.js'
-import aiRoutes from './routes/ai.routes.js'
-import reviewRoutes from "./routes/review.routes.js"
-import paymentsRoutes from "./routes/payment.routes.js"
-import dashboardRoutes from "./routes/dashbord.routes.js"
-
+import sellerRoutes from './routes/seller.routes.js';
+import productRoutes from './routes/product.routes.js';
+import cartRoutes from './routes/cart.routes.js';
+import checkoutRoutes from './routes/checkout.routes.js';
+import orderRoutes from './routes/order.routes.js';
+import wishlistRoutes from './routes/wishlist.routes.js';
+import aiRoutes from './routes/ai.routes.js';
+import reviewRoutes from './routes/review.routes.js';
+import paymentsRoutes from './routes/payment.routes.js';
+import dashboardRoutes from './routes/dashbord.routes.js';
+import passport from './config/passport.js';
+import { config } from './config/config.js';
 
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(
+  session({
+    secret: config.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: config.NODE_ENV === 'production',
+      sameSite: 'lax',
+    },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 app.get("/", (req, res)=>{
