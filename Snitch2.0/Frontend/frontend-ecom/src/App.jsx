@@ -1,4 +1,5 @@
 import SellerDashboard from './pages/seller/SellerDashboard';
+import SellerSetup from './pages/seller/SellerSetup';
 import { Navigate, Routes, Route } from "react-router-dom";
 import Login from './pages/auth/Login';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -35,6 +36,7 @@ const App = () => {
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['seller']} />}>
+        <Route path='/seller/setup' element={<SellerSetup />} />
         <Route path='/seller/dashboard' element={<SellerDashboard />} />
         <Route path='/seller/products' element={<Products />} />
         <Route path='/seller/orders' element={<SellerOrders />} />

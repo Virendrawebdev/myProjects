@@ -1,24 +1,30 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getSellerProducts , deleteProduct} from "../../services/product.api";
 import AddProductForm from "../../components/seller/AddProductForm";
 import Sidebar from "../../components/seller/Sidebar";
 import EditProductForm from "../../components/seller/EditProductForm";
+import Header from "../../components/seller/Header";
+import { getSellerDashboard } from "../../services/dashboard.api";
 
 
-const Products = (dashboard) => {
+const Products = ({ dashboard }) => {
+  const [sellerDashboard, setSellerDashboard] = useState(dashboard || null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingProduct, setEditingProduct] = useState(null); // State to hold the product being edited
 
-  const productsPerPage = 4; // Number of products to display per page
+  const productsPerPage = 8;
 
   const totalPages = Math.ceil(products.length / productsPerPage);
 
   const startIndex = (currentPage - 1) * productsPerPage;
 
   const currentProducts = products.slice(startIndex, startIndex + productsPerPage);
+  const lowStockCount = products.filter((product) => product.stock <= 5).length;
+  const formatPrice = (price) =>
+    new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(price || 0);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -35,7 +41,16 @@ const Products = (dashboard) => {
   };
 
   useEffect(() => {
-    fetchProducts();
+    getSellerProducts()
+      .then((response) => setProducts(response.data || []))
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+        setProducts([]);
+      })
+      .finally(() => setLoading(false));
+    getSellerDashboard()
+      .then((response) => setSellerDashboard(response.data))
+      .catch((error) => console.error("Seller profile error:", error));
   }, []);
 
   const handleAddSuccess = () => {
@@ -72,108 +87,127 @@ const Products = (dashboard) => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-sm text-zinc-500">Loading products...</p>
+      <div className="min-h-screen min-w-0 bg-[#f4f5ef] lg:flex">
+        <Sidebar dashboard={sellerDashboard} />
+        <div className="min-w-0 flex-1">
+          <Header dashboard={sellerDashboard} />
+          <main className="p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto max-w-7xl animate-pulse">
+              <div className="h-28 rounded-3xl bg-zinc-200" />
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {Array.from({ length: 4 }, (_, index) => <div key={index} className="h-64 rounded-2xl bg-white" />)}
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
 
-  
-  
   return (
-    <div className="sm:flex min-h-screen min-w-0 bg-[#f4f5ef]">
-       <Sidebar dashboard={dashboard} />
-   
-    <div className="min-h-screen bg-zinc-50 p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="min-h-screen min-w-0 bg-[#f4f5ef] lg:flex">
+      <Sidebar dashboard={sellerDashboard} />
+      <div className="min-w-0 flex-1">
+      <Header dashboard={sellerDashboard} />
+      <main className="min-w-0 px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-9">
+      <div className="mx-auto max-w-[1600px]">
+      <section className="mb-6 flex flex-col justify-between gap-5 rounded-3xl bg-[#e8eddb] p-5 sm:flex-row sm:items-end sm:p-8">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">
-            Products
-          </h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Manage your products and inventory
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Your catalog</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">Products</h1>
+          <p className="mt-2 text-sm text-zinc-600">Manage your listings, pricing, and inventory.</p>
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <button
-            onClick={() => setShowForm(true)}
-            className="rounded-xl  bg-red-500 ml-2 px-2 py-2 text-sm font-medium text-white scroll-m-0 transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 cursor-pointer"
-          >
-            + Add Product
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowForm(true)}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#111110] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2"
+        >
+          <span aria-hidden="true">+</span> Add product
+        </button>
+      </section>
 
+      <div className="mb-6 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Total listings</p>
+          <p className="mt-2 text-2xl font-semibold text-zinc-950">{products.length}</p>
+        </div>
+        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">In stock</p>
+          <p className="mt-2 text-2xl font-semibold text-zinc-950">{products.filter((product) => product.stock > 0).length}</p>
+        </div>
+        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Needs restock</p>
+          <p className={`mt-2 text-2xl font-semibold ${lowStockCount ? "text-amber-700" : "text-zinc-950"}`}>{lowStockCount}</p>
+        </div>
       </div>
+
       {
         showForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-zinc-950/55 p-3 backdrop-blur-sm sm:p-6">
             <AddProductForm onClose={() => setShowForm(false)} onSuccess={handleAddSuccess} />
           </div>
         )
       }
 
       {editingProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-zinc-950/55 p-3 backdrop-blur-sm sm:p-6">
         <EditProductForm product={editingProduct} onClose={() => setEditingProduct(null)} onSuccess={handleupdateSuccess} />
         </div>
       )}
 
-      <div className="rounded-2xl border bg-white *:border-zinc-200  ">
+      <div>
         {products.length === 0 ? (
-          <div className="p-10 text-center gap-2 text-sm text-zinc-500">
-            <p className="text-zinc-500 ">No products found</p>
+          <div className="rounded-3xl border border-dashed border-zinc-300 bg-white px-6 py-14 text-center">
+            <p className="text-lg font-semibold text-zinc-900">Your catalog is ready for its first product.</p>
+            <p className="mt-2 text-sm text-zinc-500">Add a product to start building your store.</p>
+            <button type="button" onClick={() => setShowForm(true)} className="mt-5 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700">Add your first product</button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {currentProducts.map((product) => (
               <div
                 key={product._id}
-                className="overflow-hidden rounded-2xl border border-zinc-200 bg-white"
+                className="group overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg"
               >
-                <div className="aspect-square bg-zinc-100">
+                <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
                   {product.images?.[0] ? (
                     <img
                       src={product.images[0]}
                       alt={product.productName}
-                      className="h-full w-full object-cover"
+                      loading="lazy"
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-sm text-zinc-400">
                       No Image
                     </div>
                   )}
+                  <span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-semibold ${product.stock > 5 ? "bg-white/95 text-emerald-700" : product.stock > 0 ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-700"}`}>
+                    {product.stock > 5 ? "In stock" : product.stock > 0 ? "Low stock" : "Out of stock"}
+                  </span>
                 </div>
 
                 <div className="p-4">
-                  <h2 className="truncate font-medium text-zinc-900">
+                  <p className="truncate text-xs font-semibold uppercase tracking-wider text-zinc-400">{product.brand} · {product.category}</p>
+                  <h2 className="mt-1 truncate font-semibold text-zinc-900">
                     {product.productName}
                   </h2>
 
-                  <div className="mt-2 flex items-center justify-between">
-                    <p className="font-semibold text-zinc-900">
-                      ₹{product.price}
-                    </p>
-                    <p className="font-semibold text-zinc-900">
-                      Discount ₹{product.discountPrice}
-                    </p>
-
-                    <p
-                      className={`text-sm ${product.stock <= 5 ? "text-red-500" : "text-zinc-500"
-                        }`}
-                    >
-                      {product.stock} left
-                    </p>
+                  <div className="mt-3 flex flex-wrap items-baseline gap-x-2">
+                    <p className="font-semibold text-zinc-950">₹{formatPrice(product.discountPrice > 0 && product.discountPrice < product.price ? product.discountPrice : product.price)}</p>
+                    {product.discountPrice > 0 && product.discountPrice < product.price && <p className="text-xs text-zinc-400 line-through">₹{formatPrice(product.price)}</p>}
+                    <p className="ml-auto text-xs text-zinc-500">{product.stock} units</p>
                   </div>
-                  <div className="mt-2 text-sm text-zinc-500">
+                  <p className="mt-3 line-clamp-2 min-h-10 text-sm leading-5 text-zinc-500">
                     {product.description}
-                  </div>
+                  </p>
 
                   <div className="mt-4 flex gap-2">
-                    <button onClick={()=>setEditingProduct(product)} className="flex-1 rounded-xl border bg-green-500 border-zinc-200 px-3 py-2 text-sm font-medium *:text-white scroll-m-0 transition-colors hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer">
+                    <button type="button" onClick={()=>setEditingProduct(product)} className="flex-1 rounded-xl border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400">
                       Edit
                     </button>
 
-                    <button onClick={()=>handleDelete(product._id)} className="flex-1 rounded-xl bg-zinc-900 px-3 py-2 text-sm font-medium text-white scroll-m-0 transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 cursor-pointer">
+                    <button type="button" onClick={()=>handleDelete(product._id)} className="flex-1 rounded-xl bg-zinc-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
                       Delete
                     </button>
                   </div>
@@ -215,8 +249,10 @@ const Products = (dashboard) => {
           </button>
         </div>
       )}
+      </div>
+      </main>
+      </div>
     </div>
-     </div>
   );
 };
 

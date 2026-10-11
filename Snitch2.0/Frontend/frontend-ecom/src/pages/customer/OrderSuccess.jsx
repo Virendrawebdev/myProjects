@@ -1,11 +1,13 @@
-import React from "react";
 import { Link } from "react-router-dom";
+import CustomerHeader from "../../components/customer/CustomerHeader";
+import StorefrontFooter from "../../components/customer/StorefrontFooter";
 
 const OrderSuccess = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4">
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-sm">
-
+    <>
+    <CustomerHeader />
+    <main className="flex min-h-[60vh] items-center justify-center bg-[#f7f7f4] p-4">
+      <div className="w-full max-w-md rounded-3xl border border-zinc-200/70 bg-white p-8 text-center shadow-sm">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
           ✓
         </div>
@@ -35,7 +37,9 @@ const OrderSuccess = () => {
         </div>
 
       </div>
-    </div>
+    </main>
+    <StorefrontFooter />
+    </>
   );
 };
 

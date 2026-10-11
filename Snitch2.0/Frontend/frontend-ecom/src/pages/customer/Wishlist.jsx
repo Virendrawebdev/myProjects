@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getWishlist, removeFromWishlist } from "../../services/wishlist.api";
 import CustomerHeader from "../../components/customer/CustomerHeader";
+import StorefrontFooter from "../../components/customer/StorefrontFooter";
+import { Link } from "react-router-dom";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -45,21 +47,26 @@ const Wishlist = () => {
   };
 
   if (loading) {
-    return <div className="p-6">Loading...</div>;
+    return <><CustomerHeader /><main className="min-h-[60vh] bg-[#f7f7f4] p-8 text-center text-zinc-500">Loading your wishlist...</main><StorefrontFooter /></>;
   }
 
   return (
     <>
     <CustomerHeader/>
-    <div className="min-h-screen bg-zinc-50 p-4">
-      <h1 className="text-2xl font-semibold text-zinc-900">
-        My Wishlist
-      </h1>
+    <main className="min-h-[60vh] bg-[#f7f7f4] px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+      <div className="mb-7 rounded-3xl bg-[#e8eddb] px-5 py-6 sm:px-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Saved for later</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950">Your wishlist</h1>
+        <p className="mt-2 text-sm text-zinc-600">A little collection of things you love.</p>
+      </div>
 
       {wishlist.length === 0 ? (
-        <p className="mt-6 text-zinc-500">
-          Your wishlist is empty.
-        </p>
+        <div className="rounded-3xl border border-dashed border-zinc-300 bg-white px-6 py-14 text-center">
+          <p className="text-lg font-semibold text-zinc-900">Nothing saved just yet.</p>
+          <p className="mt-2 text-sm text-zinc-500">Tap the heart on anything you like and it will be here.</p>
+          <Link to="/customer/CustomerProducts" className="mt-5 inline-flex rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white hover:bg-zinc-700">Discover products</Link>
+        </div>
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
           {wishlist.map((item) => {
@@ -72,16 +79,16 @@ const Wishlist = () => {
             return (
               <div
                 key={product._id}
-                className="overflow-hidden rounded-2xl bg-white"
+                className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200/70 transition hover:-translate-y-1 hover:shadow-lg"
               >
                 <img
                   src={product.images?.[0]}
                   alt={product.productName}
-                  className="aspect-square w-full object-cover"
+                  className="aspect-[4/4.6] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
                 />
 
                 <div className="p-3">
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                     {product.brand}
                   </p>
 
@@ -95,7 +102,7 @@ const Wishlist = () => {
 
                   <button
                     onClick={() => handleRemove(product._id)}
-                    className="mt-3 w-full rounded-full bg-red-100 py-2 text-sm font-medium text-red-700"
+                    className="mt-3 w-full rounded-full border border-zinc-200 py-2 text-sm font-medium text-zinc-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
                   >
                     Remove
                   </button>
@@ -105,7 +112,9 @@ const Wishlist = () => {
           })}
         </div>
       )}
-    </div>
+      </div>
+    </main>
+    <StorefrontFooter />
     </>
   );
 };

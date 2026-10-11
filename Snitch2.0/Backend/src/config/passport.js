@@ -8,15 +8,19 @@ passport.use(
     {
       clientID: config.GOOGLE_CLIENT_ID,
       clientSecret: config.GOOGLE_CLIENT_SECRET,
-      callbackURL:"/api/auth/google/callback"
+      callbackURL: "/api/auth/google/callback",
+      passReqToCallback: true,
     },
 
-    async (accessToken, refreshToken, profile, done) => {
+    async (req, accessToken, refreshToken, profile, done) => {
       try {
         const googleId = profile.id;
         const email = profile.emails?.[0]?.value;
         const fullName = profile.displayName;
         const avatar = profile.photos?.[0]?.value || "";
+        const signupRole = req.session?.googleSignupMode
+          ? req.session.googleSignupRole
+          : undefined;
 
         let user = await User.findOne({ googleId });
 
@@ -26,6 +30,9 @@ passport.use(
           if (user) {
             user.googleId = googleId;
             user.avatar = avatar;
+            if (signupRole) {
+              user.role = signupRole;
+            }
             await user.save();
           } else {
             user = await User.create({
@@ -33,9 +40,12 @@ passport.use(
               email,
               fullName,
               avatar,
-              role: "buyer",
+              role: signupRole || "buyer",
             });
           }
+        } else if (signupRole && user.role !== signupRole) {
+          user.role = signupRole;
+          await user.save();
         }
 
         return done(null, user);

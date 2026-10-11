@@ -5,7 +5,8 @@ import Seller from "../models/seller.model.js";
 import ApiError from "../utils/ApiError.js";
 
 export const getsellerDashboardService = async (sellerUserId) => {
-    const seller = await Seller.findOne({ user: sellerUserId }).select("_id");
+    const seller = await Seller.findOne({ user: sellerUserId })
+        .select("_id shopName logo");
     if (!seller) {
         throw new ApiError(404, "Seller profile not found");
     }
@@ -31,6 +32,7 @@ export const getsellerDashboardService = async (sellerUserId) => {
         .sort((first, second) => first.stock - second.stock)
         .slice(0, 5)
         .map((product) => ({
+            _id: product._id,
             productName: product.productName,
             stock: product.stock,
         }));
@@ -72,10 +74,13 @@ export const getsellerDashboardService = async (sellerUserId) => {
         return statusCounts;
     }, new Map())].map(([status, count]) => ({ _id: status, count }));
 
-    const user = await User.findById(sellerUserId).select("fullName");
+    const user = await User.findById(sellerUserId).select("fullName avatar");
     return {
         seller: {
             fullName: user?.fullName || "Seller",
+            avatar: user?.avatar || "",
+            shopName: seller.shopName,
+            logo: seller.logo,
         },
         totalProducts,
         totalOrders,

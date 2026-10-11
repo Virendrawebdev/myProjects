@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     getCart,
     updateCartQuantity,
     removeFromCart,
 } from "../../services/cart.api";
 import CustomerHeader from "../../components/customer/CustomerHeader";
+import StorefrontFooter from "../../components/customer/StorefrontFooter";
 import { Link } from "react-router-dom";
 
 const Cart = () => {
@@ -74,40 +75,47 @@ const Cart = () => {
         return total + price * item.quantity;
     }, 0);
     if (loading) {
-        return <div className="p-6">Loading...</div>;
+        return <><CustomerHeader /><main className="min-h-[60vh] bg-[#f7f7f4] p-8 text-center text-zinc-500">Loading your bag...</main><StorefrontFooter /></>;
     }
 
     return (
         <>
             <CustomerHeader />
-            <div className="min-h-screen bg-zinc-50 p-4">
-                <h1 className="text-2xl font-semibold text-zinc-900">
-                    My Cart
-                </h1>
+            <main className="min-h-[60vh] bg-[#f7f7f4] px-4 py-8 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-6xl">
+                <div className="mb-7 rounded-3xl bg-[#e8eddb] px-5 py-6 sm:px-8">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Almost yours</p>
+                    <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950">Your shopping bag</h1>
+                    <p className="mt-2 text-sm text-zinc-600">{cart.length} {cart.length === 1 ? "piece" : "pieces"} picked for you</p>
+                </div>
 
                 {cart.length === 0 ? (
-                    <p className="mt-6 text-zinc-500">
-                        Your cart is empty.
-                    </p>
+                    <div className="rounded-3xl border border-dashed border-zinc-300 bg-white px-6 py-14 text-center">
+                        <p className="text-lg font-semibold text-zinc-900">Your bag is waiting for something good.</p>
+                        <p className="mt-2 text-sm text-zinc-500">Explore the collection and find a new favourite.</p>
+                        <Link to="/customer/CustomerProducts" className="mt-5 inline-flex rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white hover:bg-zinc-700">Explore products</Link>
+                    </div>
                 ) : (
-                    <div className="mt-6 space-y-4">
+                    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+                    <div className="space-y-4">
                         {cart.map((item) => (
                             <div
                                 key={item._id}
-                                className="flex gap-4 rounded-2xl bg-white p-4"
+                                className="flex gap-4 rounded-2xl border border-zinc-200/70 bg-white p-3 shadow-sm sm:p-4"
                             >
                                 <img
-                                    src={item.product?.images?.[0]}
+                                    src={item.product?.images?.[0] || "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&q=80"}
                                     alt={item.product?.productName}
-                                    className="h-24 w-20 rounded-xl object-cover"
+                                    className="h-28 w-24 rounded-xl bg-zinc-100 object-cover sm:h-32 sm:w-28"
                                 />
 
-                                <div>
-                                    <h2 className="font-medium">
+                                <div className="flex min-w-0 flex-1 flex-col">
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">{item.product?.brand}</p>
+                                    <h2 className="mt-1 font-semibold text-zinc-900">
                                         {item.product?.productName}
                                     </h2>
 
-                                    <div className="mt-3 flex w-fit items-center rounded-lg border border-zinc-300">
+                                    <div className="mt-3 flex w-fit items-center rounded-full border border-zinc-200">
                                         <button
                                             onClick={() =>
                                                 handleQuantityChange(
@@ -138,8 +146,8 @@ const Cart = () => {
                                     </div>
 
 
-                                    <div className="flex px-2 gap-2 items-center ">
-                                        <p className="mt-2 font-semibold">
+                                    <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+                                        <p className="font-semibold text-zinc-950">
                                             ₹
                                             {item.product?.discountPrice ||
                                                 item.product?.price}
@@ -159,8 +167,8 @@ const Cart = () => {
                         ))}
                     </div>
 
-                )}
-                <div className="mt-6 rounded-2xl bg-white p-5">
+                <div className="h-fit rounded-2xl border border-zinc-200/70 bg-white p-5 shadow-sm">
+                    <h2 className="text-lg font-semibold text-zinc-900">Order summary</h2>
                     <div className="flex items-center justify-between">
                         <span className="text-zinc-600">Total</span>
                         <span className="text-xl font-semibold text-zinc-900">
@@ -170,12 +178,17 @@ const Cart = () => {
 
                     <Link
                         to="/customer/checkout"
-                        className="mt-4 block w-full rounded-full bg-zinc-900 py-3 text-center font-medium text-white"
+                        className="mt-4 block w-full rounded-full bg-zinc-900 py-3 text-center font-semibold text-white transition hover:bg-zinc-700"
                     >
                         Proceed to Checkout
                     </Link>
+                    <Link to="/customer/CustomerProducts" className="mt-3 block text-center text-sm font-medium text-zinc-600 hover:text-zinc-950">Continue shopping</Link>
                 </div>
-            </div>
+                </div>
+                )}
+                </div>
+            </main>
+            <StorefrontFooter />
 
         </>
     );

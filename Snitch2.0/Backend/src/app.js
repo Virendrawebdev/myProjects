@@ -15,8 +15,14 @@ import paymentsRoutes from './routes/payment.routes.js';
 import dashboardRoutes from './routes/dashbord.routes.js';
 import passport from './config/passport.js';
 import { config } from './config/config.js';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const app = express();
+const publicDirectory = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../public'
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,7 +42,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-
+ 
+app.use(express.static(publicDirectory));
 app.get("/", (req, res)=>{
     res.json({
         "success":true,
@@ -55,6 +62,19 @@ app.use("/api/ai", aiRoutes)
 app.use("/api/review", reviewRoutes)
 app.use("/api/payments", paymentsRoutes)
 app.use("/api/seller/dashboard", dashboardRoutes)
+
+app.get("/{*path}", (req, res, next) => {
+    const isApiRequest = req.path === "/api" || req.path.startsWith("/api/");
+
+    if (isApiRequest || path.extname(req.path) || !req.accepts("html")) {
+        return next();
+    }
+
+    res.sendFile(path.join(publicDirectory, "index.html"), (error) => {
+        if (error) next(error);
+    });
+});
+
 app.use(errorHandler);
 
 export default app;

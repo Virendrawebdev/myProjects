@@ -1,29 +1,29 @@
-import React from 'react'
 import { getMyOrders, cancelOrder } from '../../services/order.api';
 import { useEffect, useState } from 'react';
 import CustomerHeader from '../../components/customer/CustomerHeader';
+import StorefrontFooter from '../../components/customer/StorefrontFooter';
+import { Link } from 'react-router-dom';
 
 const CustomerOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const fetchOrders = async () => {
-        try {
-            const response = await getMyOrders();
-            setOrders(response?.data || []);
-            setError("");
-        } catch (error) {
-            console.error("Orders error:", error);
-            setError(error?.response?.data?.message || "Unable to load your orders.");
-            setOrders([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchOrders();
+        const loadOrders = async () => {
+            try {
+                const response = await getMyOrders();
+                setOrders(response?.data || []);
+                setError("");
+            } catch (error) {
+                console.error("Orders error:", error);
+                setError(error?.response?.data?.message || "Unable to load your orders.");
+                setOrders([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadOrders();
     }, []);
 
     const handleCancelOrder = async (orderId) => {
@@ -44,22 +44,29 @@ const CustomerOrders = () => {
     };
 
     if (loading) {
-        return <><CustomerHeader /><div className="mt-6 text-center text-sm text-zinc-500">Loading your orders...</div></>;
+        return <><CustomerHeader /><main className="flex min-h-[60vh] items-center justify-center bg-[#f7f7f4] text-sm text-zinc-500">Loading your orders...</main><StorefrontFooter /></>;
     }
 
     if (error) {
-        return <><CustomerHeader /><div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div></>;
+        return <><CustomerHeader /><main className="min-h-[60vh] bg-[#f7f7f4] px-4 py-10"><div className="mx-auto max-w-5xl rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div></main><StorefrontFooter /></>;
     }
 
     if (!orders.length) {
-        return <><CustomerHeader /><div className="mt-6 rounded-2xl border border-dashed border-zinc-300 bg-white p-8 text-center text-sm text-zinc-500">No orders yet.</div></>;
+        return <><CustomerHeader /><main className="min-h-[60vh] bg-[#f7f7f4] px-4 py-10"><div className="mx-auto max-w-5xl rounded-3xl border border-dashed border-zinc-300 bg-white px-6 py-14 text-center"><p className="text-lg font-semibold text-zinc-900">Your next favourite is out there.</p><p className="mt-2 text-sm text-zinc-500">Your orders will show here once you find it.</p><Link to="/customer/CustomerProducts" className="mt-5 inline-flex rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white">Explore products</Link></div></main><StorefrontFooter /></>;
     }
 
     return (
         <>
             <CustomerHeader />
      
-        <div className="mt-6 space-y-4">
+        <main className="min-h-[60vh] bg-[#f7f7f4] px-4 py-8 sm:px-6">
+        <div className="mx-auto max-w-5xl">
+        <div className="mb-6 rounded-3xl bg-[#e8eddb] px-5 py-6 sm:px-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">The latest</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950">Your orders</h1>
+            <p className="mt-2 text-sm text-zinc-600">Track the pieces on their way to you.</p>
+        </div>
+        <div className="space-y-4">
 
             {orders.map((order) => (
                 <div
@@ -115,6 +122,9 @@ const CustomerOrders = () => {
                 </div>
             ))}
         </div>
+        </div>
+        </main>
+        <StorefrontFooter />
            </>
     );
 };

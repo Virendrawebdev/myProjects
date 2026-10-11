@@ -1,10 +1,11 @@
 import { config } from "../config/config.js";
+import ApiError from "../utils/ApiError.js";
 import {
   loginUserService,
   logoutUserService,
   refreshAccessTokenService,
   registerUserService,
-  googleAuthService
+  googleAuthService,
 } from "../services/auth.service.js";
 
 export const registerUser = async (req, res, next) => {
@@ -58,6 +59,10 @@ export const getCurrentUser = async (req, res, next) => {
 
 export const logoutUser = async (req, res, next) => {
   try {
+    if (!req.user?._id) {
+      throw new ApiError(401, "Unauthorized request");
+    }
+
     await logoutUserService(req.user._id);
     const cookieOptions = {
       httpOnly: true,
@@ -80,6 +85,10 @@ export const logoutUser = async (req, res, next) => {
 export const refreshAccessToken = async (req, res, next) => {
   try {
     const incomingRefreshToken = req.cookies?.refreshToken;
+
+    if (!incomingRefreshToken) {
+      throw new ApiError(401, "Refresh token is required");
+    }
 
     const { accessToken, refreshToken } =
       await refreshAccessTokenService(incomingRefreshToken);
@@ -105,6 +114,10 @@ export const refreshAccessToken = async (req, res, next) => {
 
 export const googleCallback = async (req, res, next) => {
   try {
+    if (!req.user) {
+      throw new ApiError(401, "Google authentication failed");
+    }
+
     const result = await googleAuthService(req.user);
 
     const cookieOptions = {
@@ -115,12 +128,15 @@ export const googleCallback = async (req, res, next) => {
 
     const frontendUrl =
       config.NODE_ENV === "development"
-        ? "http://localhost:5173"
+        ? "http://localhost:3000"
         : config.FRONTEND_URL || "";
     const destination =
       result.user.role === "seller"
         ? "/seller/dashboard"
         : "/customer/CustomerProducts";
+
+    delete req.session.googleSignupRole;
+    delete req.session.googleSignupMode;
 
     return res
       .cookie("accessToken", result.accessToken, cookieOptions)

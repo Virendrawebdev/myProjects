@@ -1,36 +1,52 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { getProductById } from "../../services/product.api";
 import CustomerHeader from "../../components/customer/CustomerHeader";
+import StorefrontFooter from "../../components/customer/StorefrontFooter";
 import { addToWishlist, getWishlist, removeFromWishlist } from "../../services/wishlist.api";
 import { addToCart } from "../../services/cart.api";
 
 const ProductDetails = () => {
     const { productId } = useParams();
+    const navigate = useNavigate();
 
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
-    const [size, setSize] = useState("");
     const [loading, setLoading] = useState(true);
+    const [cartAction, setCartAction] = useState("");
+    const [cartFeedback, setCartFeedback] = useState(null);
     const [wishlistProductIds, setWishlistProductIds] = useState([]);
 
-    const isWishlisted = product ? wishlistProductIds.includes(product._id) : false;
+    const isWishlisted = product
+        ? wishlistProductIds.some((id) => String(id) === String(product._id))
+        : false;
+    const hasDiscount = product?.discountPrice > 0 && product.discountPrice < product.price;
+    const discountPercent = hasDiscount
+        ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+        : 0;
+    const formatPrice = (price) =>
+        new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(price || 0);
 
     const handleWishlist = async () => {
         if (!product) return;
 
         try {
             if (isWishlisted) {
-                setWishlistProductIds((prev) => prev.filter((id) => id !== product._id));
+                setWishlistProductIds((prev) => prev.filter((id) => String(id) !== String(product._id)));
                 await removeFromWishlist(product._id);
             } else {
                 setWishlistProductIds((prev) => [...prev, product._id]);
                 await addToWishlist(product._id);
             }
+            window.dispatchEvent(
+                new CustomEvent("wishlist:changed", {
+                    detail: { productId: String(product._id), wishlisted: !isWishlisted },
+                })
+            );
         } catch (error) {
             setWishlistProductIds((prev) => {
                 if (isWishlisted) return [...prev, product._id];
-                return prev.filter((id) => id !== product._id);
+                return prev.filter((id) => String(id) !== String(product._id));
             });
             console.error("Wishlist error:", error);
             alert(
@@ -99,147 +115,196 @@ const ProductDetails = () => {
     }, [product?._id]);
 
     if (loading) {
-        return <div className="p-6">Loading...</div>;
+        return (
+            <>
+                <CustomerHeader />
+                <main className="min-h-[60vh] bg-[#f7f7f4] px-4 py-10 sm:px-6">
+                    <div className="mx-auto grid max-w-6xl animate-pulse gap-6 md:grid-cols-2">
+                        <div className="aspect-[4/4.6] rounded-3xl bg-zinc-200" />
+                        <div className="space-y-4 py-6">
+                            <div className="h-4 w-24 rounded bg-zinc-200" />
+                            <div className="h-9 w-3/4 rounded bg-zinc-200" />
+                            <div className="h-7 w-32 rounded bg-zinc-200" />
+                            <div className="h-24 rounded bg-zinc-200" />
+                        </div>
+                    </div>
+                </main>
+                <StorefrontFooter />
+            </>
+        );
     }
 
     if (!product) {
-        return <div className="p-6">Product not found</div>;
+        return (
+            <>
+                <CustomerHeader />
+                <main className="flex min-h-[60vh] items-center justify-center bg-[#f7f7f4] px-4 py-10">
+                    <div className="w-full max-w-lg rounded-3xl border border-zinc-200 bg-white p-8 text-center">
+                        <h1 className="text-xl font-semibold text-zinc-900">We couldn't find that piece.</h1>
+                        <p className="mt-2 text-sm text-zinc-500">It may have been removed or is no longer available.</p>
+                        <button
+                            type="button"
+                            onClick={() => navigate("/customer/CustomerProducts")}
+                            className="mt-5 rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700"
+                        >
+                            Browse all products
+                        </button>
+                    </div>
+                </main>
+                <StorefrontFooter />
+            </>
+        );
     }
 
-    const handleAddToCart = async () => {
+    const handleAddToCart = async (buyNow = false) => {
+        setCartAction(buyNow ? "buy" : "add");
+        setCartFeedback(null);
         try {
             await addToCart(product._id, quantity);
-
-            alert("Product added to cart 🛒");
+            if (buyNow) {
+                navigate("/customer/checkout");
+                return;
+            }
+            setCartFeedback({ type: "success", message: "Added to your bag." });
         } catch (error) {
             console.error("Add to cart error:", error);
-
-            alert(
-                error.response?.data?.message ||
-                "Failed to add product to cart"
-            );
+            setCartFeedback({
+                type: "error",
+                message: error.response?.data?.message || "Couldn't add this item. Please try again.",
+            });
+        } finally {
+            setCartAction("");
         }
     };
 
     return (
         <>
             <CustomerHeader />
-            <div className="min-h-screen bg-zinc-50 p-4">
-                <div className="mx-auto max-w-6xl">
-                    <div className="grid gap-4 md:grid-cols-2">
-
-                        {/* Image */}
-                        <div className="relative overflow-hidden rounded-2xl bg-white">
+            <main className="min-h-[60vh] overflow-x-clip bg-[#f7f7f4] px-4 py-6 sm:px-6 sm:py-10">
+                <div className="mx-auto min-w-0 max-w-6xl">
+                    <button
+                        type="button"
+                        onClick={() => navigate("/customer/CustomerProducts")}
+                        className="mb-5 text-sm font-medium text-zinc-500 transition hover:text-zinc-950"
+                    >
+                        ← Back to collection
+                    </button>
+                    <div className="grid min-w-0 gap-5 sm:gap-6 md:grid-cols-2 md:gap-10">
+                        <div className="relative aspect-[4/4.6] min-w-0 overflow-hidden rounded-3xl bg-white shadow-sm">
                             <img
-                                src={product.images?.[0]}
+                                src={product.images?.[0] || "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80"}
                                 alt={product.productName}
-                                className="h-full max-h-[600px] min-h-[180px] w-full object-cover"
+                                className="absolute inset-0 h-full w-full object-cover"
                             />
+                            {hasDiscount && (
+                                <span className="absolute left-4 top-4 rounded-full bg-[#e2f163] px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-zinc-900">
+                                    Save {discountPercent}%
+                                </span>
+                            )}
                             <button
                                 type="button"
-                                aria-label="Add to wishlist"
+                                aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
                                 onClick={handleWishlist}
-                                className={`absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-lg shadow-sm transition hover:scale-105 ${isWishlisted ? "bg-red-100 text-red-500" : "bg-white text-zinc-700"}`}
+                                className={`absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full text-xl shadow-sm transition hover:scale-105 ${isWishlisted ? "bg-red-100 text-red-500" : "bg-white text-zinc-700"}`}
                             >
                                 {isWishlisted ? "♥" : "♡"}
                             </button>
                         </div>
 
-                        {/* Details */}
-                        <div className="flex flex-col justify-center">
-                            <p className="text-sm text-zinc-500">
-                                {product.brand}
+                        <div className="flex min-w-0 flex-col justify-center rounded-3xl border border-zinc-200/70 bg-white p-4 shadow-sm sm:p-8">
+                            <p className="break-words text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                                {product.brand || "SNITCH"}{product.category ? ` · ${product.category}` : ""}
                             </p>
-
-
-                            <h1 className="mt-1 text-3xl font-semibold text-zinc-900">
+                            <h1 className="mt-3 break-words text-2xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">
                                 {product.productName}
                             </h1>
 
-                            <p className="mt-2 text-2xl font-semibold text-zinc-900">
-                                ₹{product.Price || product.price}
-                            </p>
+                            <div className="mt-4 flex flex-wrap items-baseline gap-3">
+                                <p className="text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl">
+                                    ₹{formatPrice(hasDiscount ? product.discountPrice : product.price)}
+                                </p>
+                                {hasDiscount && (
+                                    <>
+                                        <p className="text-lg text-zinc-400 line-through">₹{formatPrice(product.price)}</p>
+                                        <p className="text-sm font-semibold text-emerald-700">You save ₹{formatPrice(product.price - product.discountPrice)}</p>
+                                    </>
+                                )}
+                            </div>
 
-                            <p className="mt-2 text-2xl font-semibold text-zinc-900">
-                                ₹{product.discountPrice || product.price} Off
-                            </p>
-
-                            <p className="mt-2 leading-7 text-zinc-600">
+                            <p className="mt-5 break-words leading-7 text-zinc-600">
                                 {product.description}
                             </p>
 
-                            {/* Size */}
-                            <div className="mt-2">
-                                <p className="mb-3 text-sm font-medium text-zinc-900">
-                                    Select Size
-                                </p>
-
-                                <div className="flex gap-2">
-                                    {["S", "M", "L", "XL"].map((item) => (
-                                        <button
-                                            key={item}
-                                            onClick={() => setSize(item)}
-                                            className={`h-10 w-12 rounded-lg border text-sm font-medium ${size === item
-                                                ? "border-zinc-900 bg-zinc-900 text-white"
-                                                : "border-zinc-300 bg-white text-zinc-900"
-                                                }`}
-                                        >
-                                            {item}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Quantity */}
-                            <div className="mt-2">
-                                <p className="mb-3 text-sm font-medium text-zinc-900">
+                            <div className="mt-6 flex min-w-0 flex-wrap items-center justify-between gap-4 border-y border-zinc-100 py-5">
+                                <div>
+                                    <p className="mb-2 text-sm font-medium text-zinc-900">
                                     Quantity
-                                </p>
-
-                                <div className="flex w-fit items-center rounded-lg border border-zinc-300 bg-white">
+                                    </p>
+                                    <div className="flex w-fit items-center rounded-full border border-zinc-200 bg-white">
                                     <button
-                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="px-4 py-2"
+                                        type="button"
+                                        aria-label="Decrease quantity"
+                                        onClick={() => setQuantity((current) => Math.max(1, current - 1))}
+                                        disabled={quantity <= 1 || product.stock < 1}
+                                        className="h-10 w-10 rounded-full text-lg transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
                                     >
                                         −
                                     </button>
 
-                                    <span className="px-4">
+                                    <span aria-live="polite" className="min-w-8 text-center text-sm font-medium">
                                         {quantity}
                                     </span>
 
                                     <button
-                                        onClick={() =>
-                                            setQuantity(Math.min(product.stock, quantity + 1))
-                                        }
-                                        className="px-4 py-2"
+                                        type="button"
+                                        aria-label="Increase quantity"
+                                        onClick={() => setQuantity((current) => Math.min(product.stock, current + 1))}
+                                        disabled={quantity >= product.stock}
+                                        className="h-10 w-10 rounded-full text-lg transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
                                     >
                                         +
                                     </button>
+                                    </div>
                                 </div>
+
+                                <p className={`break-words text-sm font-medium ${product.stock > 0 ? "text-emerald-700" : "text-red-600"}`}>
+                                    {product.stock > 0 ? `${product.stock} available` : "Currently out of stock"}
+                                </p>
                             </div>
 
-                            <p className="mt-2 text-sm text-zinc-500">
-                                Stock: {product.stock}
-                            </p>
-
-                            <div className="mt-4 flex gap-3">
-                                <button onClick={handleAddToCart} className="flex-1 rounded-full border border-zinc-900 bg-white px-6 py-3 font-medium text-zinc-900">
-                                    Add to Cart
+                            <div className="mt-5 grid min-w-0 gap-3 sm:grid-cols-2">
+                                <button
+                                    type="button"
+                                    onClick={() => handleAddToCart(false)}
+                                    disabled={product.stock < 1 || Boolean(cartAction)}
+                                    className="min-h-12 min-w-0 whitespace-normal break-words rounded-full border border-zinc-300 bg-white px-5 py-3 font-semibold text-zinc-900 transition hover:border-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {cartAction === "add" ? "Adding..." : "Add to bag"}
                                 </button>
-
-                                <button className="flex-1 rounded-full bg-zinc-900 px-6 py-3 font-medium text-white">
-                                    Buy Now
+                                <button
+                                    type="button"
+                                    onClick={() => handleAddToCart(true)}
+                                    disabled={product.stock < 1 || Boolean(cartAction)}
+                                    className="min-h-12 min-w-0 whitespace-normal break-words rounded-full bg-zinc-900 px-5 py-3 font-semibold text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {cartAction === "buy" ? "Opening bag..." : "Buy now"}
                                 </button>
                             </div>
+                            {cartFeedback && (
+                                <p
+                                    role={cartFeedback.type === "error" ? "alert" : "status"}
+                                    className={`mt-3 break-words text-sm ${cartFeedback.type === "error" ? "text-red-600" : "text-emerald-700"}`}
+                                >
+                                    {cartFeedback.message}
+                                </p>
+                            )}
                         </div>
-
                     </div>
                 </div>
-            </div>
+            </main>
+            <StorefrontFooter />
         </>
     );
 };
 
 export default ProductDetails;
-

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { recommendProducts } from "../../services/ai.api";
 import CustomerHeader from "../../components/customer/CustomerHeader";
+import StorefrontFooter from "../../components/customer/StorefrontFooter";
 
 const AIRecommend = () => {
   const [prompt, setPrompt] = useState("");
@@ -37,15 +38,15 @@ const AIRecommend = () => {
     <>
         <CustomerHeader/>
     
-    <div className="min-h-screen bg-zinc-50 px-4 py-8">
+    <main className="min-h-[60vh] bg-[#f7f7f4] px-4 py-8">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <div className="text-center">
-          <p className="text-sm font-medium text-zinc-500">
+        <div className="rounded-3xl bg-[#e8eddb] px-5 py-9 text-center sm:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
             SNITCH 2.0 AI
           </p>
 
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 md:text-4xl">
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950 md:text-4xl">
             Find Your Perfect Style
           </h1>
 
@@ -60,7 +61,7 @@ const AIRecommend = () => {
           onSubmit={handleRecommend}
           className="mx-auto mt-8 max-w-2xl"
         >
-          <div className="rounded-2xl bg-white p-3 shadow-sm">
+          <div className="rounded-2xl border border-zinc-200/70 bg-white p-3 shadow-sm">
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -96,8 +97,8 @@ const AIRecommend = () => {
               {products.map((product) => (
                 <Link
                   key={product._id}
-                  to={`/products/${product._id}`}
-                  className="group overflow-hidden rounded-2xl bg-white"
+                  to={`/customer/product/${product._id}`}
+                  className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200/70 transition hover:-translate-y-1 hover:shadow-lg"
                 >
                   {/* Image */}
                   <div className="aspect-[3/4] overflow-hidden bg-zinc-100">
@@ -116,7 +117,7 @@ const AIRecommend = () => {
 
                   {/* Details */}
                   <div className="p-4">
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                       {product.brand || product.category}
                     </p>
 
@@ -150,7 +151,8 @@ const AIRecommend = () => {
           </div>
         )}
       </div>
-    </div>
+    </main>
+    <StorefrontFooter />
       </>
   
   );

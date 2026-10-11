@@ -18,7 +18,26 @@ const router = Router();
 router.post('/register', validate(registerSchema), registerUser);
 router.post('/login', validate(loginSchema), loginUser);
 
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', (req, res, next) => {
+  const isRegistration = req.query.mode === 'register';
+  const requestedRole = req.query.role;
+
+  req.session.googleSignupMode = isRegistration;
+  req.session.googleSignupRole =
+    isRegistration && ['buyer', 'seller'].includes(requestedRole)
+      ? requestedRole
+      : undefined;
+
+  req.session.save((error) => {
+    if (error) {
+      return next(error);
+    }
+
+    passport.authenticate('google', {
+      scope: ['profile', 'email'],
+    })(req, res, next);
+  });
+});
 
 router.get(
   '/google/callback',
@@ -35,5 +54,6 @@ router.get(
 router.get('/me', verifyJWT, getCurrentUser);
 router.post('/logout', verifyJWT, logoutUser);
 router.post('/refresh-token', refreshAccessToken);
+
 
 export default router;

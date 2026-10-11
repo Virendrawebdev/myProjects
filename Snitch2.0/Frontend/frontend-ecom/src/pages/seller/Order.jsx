@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../../components/seller/Sidebar";
+import Header from "../../components/seller/Header";
 import { getSellerOrders, updateOrderStatus, cancelOrder } from "../../services/order.api";
+import { getSellerDashboard } from "../../services/dashboard.api";
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [sellerDashboard, setSellerDashboard] = useState(null);
 
     const getStatusStyle = (orderStatus) => {
         switch (orderStatus) {
@@ -25,22 +28,14 @@ const Orders = () => {
         }
     };
 
-    const fetchOrders = async () => {
-        try {
-            const response = await getSellerOrders();
-
-            console.log("Seller orders:", response);
-
-            setOrders(response.data || []);
-        } catch (error) {
-            console.error("Orders error:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchOrders();
+        getSellerOrders()
+            .then((response) => setOrders(response.data || []))
+            .catch((error) => console.error("Orders error:", error))
+            .finally(() => setLoading(false));
+        getSellerDashboard()
+            .then((response) => setSellerDashboard(response.data))
+            .catch((error) => console.error("Seller profile error:", error));
     }, []);
 
     const handleStatusChange = async (orderId, orderStatus) => {
@@ -82,62 +77,66 @@ const Orders = () => {
     };
 
     return (
-        <div className="sm:flex min-h-screen min-w-0 bg-[#f4f5ef]">
-            <Sidebar dashboard={false} />
+        <div className="min-h-screen min-w-0 bg-[#f4f5ef] lg:flex">
+            <Sidebar dashboard={sellerDashboard} />
 
-            <main className="ml-0 min-h-screen p-4 md:ml-20 md:p-6">
-                <h1 className="text-2xl font-semibold text-zinc-900">
-                    Orders
-                </h1>
+            <div className="min-w-0 flex-1">
+            <Header dashboard={sellerDashboard} />
+            <main className="min-w-0 px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-9">
+                <div className="mx-auto max-w-7xl">
+                <section className="mb-6 flex flex-col justify-between gap-4 rounded-3xl bg-[#e8eddb] p-5 sm:flex-row sm:items-end sm:p-8">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Fulfilment</p>
+                        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">Orders</h1>
+                        <p className="mt-2 text-sm text-zinc-600">Review purchases and keep customers up to date.</p>
+                    </div>
+                    <span className="w-fit rounded-full bg-white/70 px-4 py-2 text-sm font-semibold text-zinc-700">{orders.length} total</span>
+                </section>
 
                 {loading ? (
-                    <p className="mt-6 text-zinc-500">Loading orders...</p>
+                    <div className="space-y-3">
+                        {Array.from({ length: 3 }, (_, index) => <div key={index} className="h-24 animate-pulse rounded-2xl bg-white" />)}
+                    </div>
                 ) : orders.length === 0 ? (
-                    <p className="mt-6 text-zinc-500">No orders found.</p>
+                    <div className="rounded-3xl border border-dashed border-zinc-300 bg-white px-6 py-14 text-center">
+                        <p className="text-lg font-semibold text-zinc-900">No orders yet</p>
+                        <p className="mt-2 text-sm text-zinc-500">New customer orders will appear here.</p>
+                    </div>
                 ) : (
-                    <div className="mt-6">
-
-
-                        <div className="space-y-3">
+                    <div className="space-y-3">
                             {orders.map((order) => (
                                 <div
                                     key={order._id}
-                                    className="rounded-2xl border border-zinc-200 bg-white p-4"
+                                    className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5"
                                 >
                                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                         <div>
-                                            <p className="font-medium text-zinc-900">
+                                            <p className="font-semibold text-zinc-900">
                                                 Order #{order._id.slice(-6)}
                                             </p>
 
                                             <p className="mt-1 text-sm text-zinc-500">
-                                                {new Date(order.createdAt).toLocaleDateString()}
+                                                {new Date(order.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                                             </p>
                                         </div>
 
-                                        <div className="flex items-center justify-between gap-6 sm:justify-end">
+                                        <div className="flex flex-wrap items-center justify-between gap-4 sm:justify-end sm:gap-6">
                                             <div>
                                                 <p className="text-xs text-zinc-500">Amount</p>
                                                 <p className="font-semibold text-zinc-900">
-                                                    ₹{order.totalAmount}
+                                                    ₹{Number(order.totalAmount || 0).toLocaleString("en-IN")}
                                                 </p>
                                             </div>
 
                                             <div>
                                                 <p className="text-xs text-zinc-500">Status</p>
-                                                {/* <span
-                                                    className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${getStatusStyle(
-                                                        order.orderStatus
-                                                    )}`}
-                                                >
-                                                    {order.orderStatus}
-                                                </span> */}
                                                 <select
+                                                    aria-label={`Update status for order ${order._id.slice(-6)}`}
                                                     value={order.orderStatus}
                                                     onChange={(e) =>
                                                         handleStatusChange(order._id, e.target.value)
                                                     }
-                                                    className={`rounded-full px-3 py-1 text-xs font-medium outline-none ${getStatusStyle(
+                                                    className={`mt-1 rounded-full border-0 px-3 py-2 text-xs font-semibold outline-none ring-1 ring-inset ring-black/5 ${getStatusStyle(
                                                         order.orderStatus
                                                     )}`}
                                                 >
@@ -149,8 +148,9 @@ const Orders = () => {
                                                 </select>
                                                 {order.orderStatus !== "Cancelled" && (
                                                     <button
+                                                        type="button"
                                                         onClick={() => handleCancelOrder(order._id)}
-                                                        className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-200"
+                                                        className="mt-1 rounded-full px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-50"
                                                     >
                                                         Cancel
                                                     </button>
@@ -160,10 +160,11 @@ const Orders = () => {
                                     </div>
                                 </div>
                             ))}
-                        </div>
                     </div>
                 )}
+                </div>
             </main>
+            </div>
         </div>
     );
 };

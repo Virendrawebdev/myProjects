@@ -1,9 +1,6 @@
-import { ArrowUpRight } from "lucide-react";
-
 const StatCard = ({
   title,
   value,
-  change,
   icon: Icon,
 }) => {
   return (
@@ -24,16 +21,9 @@ const StatCard = ({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-1.5 text-xs sm:mt-5 sm:text-sm">
-        <span className="flex items-center font-medium text-emerald-600">
-          <ArrowUpRight size={15} />
-          {change}
-        </span>
-
-        <span className="text-zinc-400">
-          from last month
-        </span>
-      </div>
+      <p className="mt-4 text-xs text-zinc-400 sm:mt-5">
+        {title === "Total Revenue" ? "Revenue from completed orders" : "Across your store"}
+      </p>
     </div>
   );
 };

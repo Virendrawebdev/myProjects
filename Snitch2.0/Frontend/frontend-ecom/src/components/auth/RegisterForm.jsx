@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/auth.api";
+import ContinueWithGoogle from "./ContinueWithGoogle";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -146,7 +147,7 @@ const RegisterForm = () => {
           {error}
         </p>
       )}
-
+      <ContinueWithGoogle role={formData.role} mode="register" />
       {/* Submit */}
       <button
         type="submit"

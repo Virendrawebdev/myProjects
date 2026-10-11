@@ -1,7 +1,8 @@
 import User from "../models/user.model.js"
 import ApiError from "../utils/ApiError.js";
 import { config } from "../config/config.js";
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
+import crypto from "crypto";
 
 
 export const registerUserService =async (userData)=>{
@@ -92,6 +93,11 @@ export const refreshAccessTokenService = async (incomingRefreshToken) => {
   await user.save({
     validateBeforeSave: false,
   });
+
+  return {
+    accessToken,
+    refreshToken,
+  };
 }
 
   export const googleAuthService = async (user) => {

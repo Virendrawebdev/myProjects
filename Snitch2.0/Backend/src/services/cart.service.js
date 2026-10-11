@@ -11,10 +11,10 @@ export const addToCartService = async (userId, productId, quantity) => {
     let cart = await Cart.findOne({ user: userId });
     
     if(!cart){
-        cart = await Cart.create({
+        return Cart.create({
             user: userId,
             products: [{ product: productId, quantity: quantity || 1 }]
-        })
+        });
     }
     const existingProduct =cart.products.find((item)=>item.product.toString()===productId);
     if(existingProduct){
