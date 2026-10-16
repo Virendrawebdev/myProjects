@@ -128,7 +128,7 @@ export const googleCallback = async (req, res, next) => {
 
     const frontendUrl =
       config.NODE_ENV === "development"
-        ? "http://localhost:3000"
+        ? config.GOOGLE_CALLBACK_URL
         : config.FRONTEND_URL || "";
     const destination =
       result.user.role === "seller"
