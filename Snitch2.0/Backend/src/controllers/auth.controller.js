@@ -127,15 +127,13 @@ export const googleCallback = async (req, res, next) => {
     };
 
     const frontendUrl =
-      config.FRONTEND_URL?.trim() ||
-      (config.NODE_ENV === "development" ? "http://localhost:3000" : "");
+      config.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : config.FRONTEND_URL || "";
     const destination =
       result.user.role === "seller"
         ? "/seller/dashboard"
         : "/customer/CustomerProducts";
-    const redirectUrl = frontendUrl
-      ? new URL(destination, frontendUrl).toString()
-      : destination;
 
     delete req.session.googleSignupRole;
     delete req.session.googleSignupMode;
@@ -143,7 +141,7 @@ export const googleCallback = async (req, res, next) => {
     return res
       .cookie("accessToken", result.accessToken, cookieOptions)
       .cookie("refreshToken", result.refreshToken, cookieOptions)
-      .redirect(redirectUrl);
+      .redirect(`${frontendUrl}${destination}`);
   } catch (error) {
     console.error("Google callback error:", error);
     next(error);

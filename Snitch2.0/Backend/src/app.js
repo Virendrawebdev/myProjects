@@ -19,6 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const app = express();
+app.set('trust proxy', 1);
 const publicDirectory = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../public'
